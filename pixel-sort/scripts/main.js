@@ -22,23 +22,22 @@ function setup() {
 	createCanvas(img.width, img.height);
 	// image(img, 0, 0);
 
+	loadBuffer(img);
+	displayBuffer();
+
 	image(imgDisplay, 0, 0);
 }
 
 function draw() {
-	image(img, 0, 0);
+	imgBuffer.loadPixels();
 	while (column < width-1) {
-		img.loadPixels();
 		sortColumn();
 		column++;
-		img.updatePixels();
 	}
 
 	while (row < height-1) {
-		img.loadPixels();
 		sortRow();
 		row++;
-		img.updatePixels();
 	}
 }
 
@@ -70,7 +69,7 @@ function sortColumn() {
 
 		for (var i = 0; i < sortLength; i++) {
 			// unsorted[i] = img.pixels[x + (y+i) * img.width];
-			unsorted[i] = getColorAtPixel(x,y+i);
+			unsorted[i] = getColorAtPixel(imgBuffer,x,y+i);
 			// unsorted[i] = color(img.pixels[4*x + 4*(y+i)*img.width],
 			// 										img.pixels[4*x + 4*(y+i)*img.width + 1],
 			// 										img.pixels[4*x + 4*(y+i)*img.width + 2],
@@ -138,11 +137,11 @@ function sortRow() {
 
 function getFirstNotBlackY(x, y) {
 	if (y < height) {
-		var c = getColorAtPixel(x,y);
+		var c = getColorAtPixel(imgBuffer,x,y);
 		while (c > blackValue) {
 			y++;
 			if(y >= height) return height-1;
-			var c = getColorAtPixel(x,y);
+			var c = getColorAtPixel(imgBuffer,x,y);
 		}
 	}
 	return y-1;
@@ -151,66 +150,66 @@ function getFirstNotBlackY(x, y) {
 function getNextBlackY(x, y) {
   y++;
   if (y < height) {
-  	var c = getColorAtPixel(x,y);
+  	var c = getColorAtPixel(imgBuffer,x,y);
 		while (c < blackValue) {
 			y++;
 			if(y >= height) return height-1;
-			var c = getColorAtPixel(x,y);
+			var c = getColorAtPixel(imgBuffer,x,y);
 		} 
 	}
 	return y-1;
 }
 
 function getFirstNotBlackX(x, y) {
-	var c = getColorAtPixel(x,y);
+	var c = getColorAtPixel(imgBuffer,x,y);
 	while (c > blackValue) {
 		x++;
 		if (x >= width) return -1;
-		var c = getColorAtPixel(x,y);
+		var c = getColorAtPixel(imgBuffer,x,y);
 	} 
 	return x;
 }
 
 function getNextBlackX(x,y) {
 	x++;
-	var c = getColorAtPixel(x,y);
+	var c = getColorAtPixel(imgBuffer,x,y);
 	while (c < blackValue) {
 		x++;
 		if (x >= width) return -1;
-		var c = getColorAtPixel(x,y);
+		var c = getColorAtPixel(imgBuffer,x,y);
 	}
 	return x-1;
 }
 
 //brightness
 function getFirstBrightX(x,y) {
-	var c = getColorAtPixel(x,y);
+	var c = getColorAtPixel(imgBuffer,x,y);
 	while (brightness(c) < brightnessValue) {
 		x++;
 		if (x >= width) return -1;
-		c = getColorAtPixel(x,y);
+		c = getColorAtPixel(imgBuffer,x,y);
 	}
 	return x;
 }
 
 function getNextDarkX(x,y) {
 	x++;
-	c = getColorAtPixel(x,y);
+	c = getColorAtPixel(imgBuffer,x,y);
 	while (brightness(c) > brightnessValue) {
 		x++;
 		if (x >= width) return width-1;
-		c = getColorAtPixel(x,y);
+		c = getColorAtPixel(imgBuffer,x,y);
 	}
 	return x-1;
 }
 
 function getFirstBrightY(x,y) {
-	c = getColorAtPixel(x,y);
+	c = getColorAtPixel(imgBuffer,x,y);
 	if (y < height) {
 		while (brightness(c) < brightnessValue) {
 			y++;
 			if (y >= height) return -1;
-			c = getColorAtPixel(x,y);
+			c = getColorAtPixel(imgBuffer,x,y);
 		}
 	}
 	return y;
@@ -218,21 +217,42 @@ function getFirstBrightY(x,y) {
 
 function getNextDarkY(x,y) {
 	y++;
-	c = getColorAtPixel(x,y);
+	c = getColorAtPixel(imgBuffer,x,y);
 	if (y < height) {
 		while (brightness(c) > brightnessValue) {
 			y++;
 			if (y >= height) return height-1;
-			c = getColorAtPixel(x,y);
+			c = getColorAtPixel(imgBuffer,x,y);
 		}
 	}
 	return y-1;
 }
 
-function getColorAtPixel(x,y) {
-	var c = color(img.pixels[4*x + 4*y*img.width],    	  //r
-									img.pixels[4*x + 4*y*img.width + 1],	//g
-									img.pixels[4*x + 4*y*img.width + 2],  //b
-									img.pixels[4*x + 4*y*img.width + 3]); //a
+function getColorAtPixel(image,x,y) {
+	var c = color(image.pixels[4*x + 4*y*image.width],    	  //r
+									image.pixels[4*x + 4*y*image.width + 1],	//g
+									image.pixels[4*x + 4*y*image.width + 2],  //b
+									image.pixels[4*x + 4*y*image.width + 3]); //a
 	return c;
+}
+
+function loadBuffer(image) {
+	image.loadPixels();
+	imgBuffer.loadPixels();
+
+	for (var i = 0; i < image.pixels.length; i++) {
+		imgBuffer.pixels[i] = image.pixels[i];
+	}
+
+	imgBuffer.updatePixels();
+}
+
+function displayBuffer() {
+	imgDisplay.loadPixels();
+	imgBuffer.loadPixels();
+
+	for(var i = 0 ; i < img.pixels.length ; i++){
+		imgDisplay.pixels[i] = imgBuffer.pixels[i];	
+	}
+	imgDisplay.updatePixels();
 }
