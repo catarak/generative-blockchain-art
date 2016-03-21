@@ -1,11 +1,9 @@
 var img;
-var imgDisplay;
-var imgBuffer;
 var column = 0;
 var row = 0;
 // var blackValue = 777216;
 var blackValue;
-var brightnessValue = 60; //0-255
+var brightnessValue = 50; //0-255
 
 var mode=1;
 
@@ -13,31 +11,27 @@ function preload() {
 	img = loadImage("assets/arches2.jpg");
 	// blackValue = color(11, 220, 0, 255);
 	blackValue = color(175, 175, 0, 255);
-	pixelDensity(1);
 }
 
 function setup() {
-	imgBuffer = createImage(img.width, img.height);
-	imgDisplay = createImage(img.width, img.height);
-	createCanvas(img.width, img.height);
+	createCanvas(600, 600);
 	// image(img, 0, 0);
-
-	loadBuffer(img);
-	displayBuffer();
-
-	image(imgDisplay, 0, 0);
 }
 
 function draw() {
-	imgBuffer.loadPixels();
+	image(img, 0, 0);
 	while (column < width-1) {
+		img.loadPixels();
 		sortColumn();
 		column++;
+		img.updatePixels();
 	}
 
 	while (row < height-1) {
+		img.loadPixels();
 		sortRow();
 		row++;
+		img.updatePixels();
 	}
 }
 
@@ -69,14 +63,22 @@ function sortColumn() {
 
 		for (var i = 0; i < sortLength; i++) {
 			// unsorted[i] = img.pixels[x + (y+i) * img.width];
-			unsorted[i] = getColorAtPixel(imgBuffer,x,y+i);
+			unsorted[i] = getColorAtPixel(x,y+i);
 			// unsorted[i] = color(img.pixels[4*x + 4*(y+i)*img.width],
 			// 										img.pixels[4*x + 4*(y+i)*img.width + 1],
 			// 										img.pixels[4*x + 4*(y+i)*img.width + 2],
 			// 										img.pixels[4*x + 4*(y+i)*img.width + 3]);
 		}
 
-		sorted = sort(unsorted);
+		sorted = unsorted.sort(function(c1, c2) {
+			if (brightness(c1) < brightness(c2)) {
+				return -1;
+			}
+			if (brightness(c1) > brightness(c2)) {
+				return 1;
+			}
+			return 0;
+		});
 
 		for (var i = 0; i < sortLength; i++) {
 			img.pixels[4*x + 4*(y+i)*img.width] = red(sorted[i]);
@@ -137,11 +139,11 @@ function sortRow() {
 
 function getFirstNotBlackY(x, y) {
 	if (y < height) {
-		var c = getColorAtPixel(imgBuffer,x,y);
+		var c = getColorAtPixel(x,y);
 		while (c > blackValue) {
 			y++;
 			if(y >= height) return height-1;
-			var c = getColorAtPixel(imgBuffer,x,y);
+			var c = getColorAtPixel(x,y);
 		}
 	}
 	return y-1;
@@ -150,66 +152,66 @@ function getFirstNotBlackY(x, y) {
 function getNextBlackY(x, y) {
   y++;
   if (y < height) {
-  	var c = getColorAtPixel(imgBuffer,x,y);
+  	var c = getColorAtPixel(x,y);
 		while (c < blackValue) {
 			y++;
 			if(y >= height) return height-1;
-			var c = getColorAtPixel(imgBuffer,x,y);
+			var c = getColorAtPixel(x,y);
 		} 
 	}
 	return y-1;
 }
 
 function getFirstNotBlackX(x, y) {
-	var c = getColorAtPixel(imgBuffer,x,y);
+	var c = getColorAtPixel(x,y);
 	while (c > blackValue) {
 		x++;
 		if (x >= width) return -1;
-		var c = getColorAtPixel(imgBuffer,x,y);
+		var c = getColorAtPixel(x,y);
 	} 
 	return x;
 }
 
 function getNextBlackX(x,y) {
 	x++;
-	var c = getColorAtPixel(imgBuffer,x,y);
+	var c = getColorAtPixel(x,y);
 	while (c < blackValue) {
 		x++;
 		if (x >= width) return -1;
-		var c = getColorAtPixel(imgBuffer,x,y);
+		var c = getColorAtPixel(x,y);
 	}
 	return x-1;
 }
 
 //brightness
 function getFirstBrightX(x,y) {
-	var c = getColorAtPixel(imgBuffer,x,y);
+	var c = getColorAtPixel(x,y);
 	while (brightness(c) < brightnessValue) {
 		x++;
 		if (x >= width) return -1;
-		c = getColorAtPixel(imgBuffer,x,y);
+		c = getColorAtPixel(x,y);
 	}
 	return x;
 }
 
 function getNextDarkX(x,y) {
 	x++;
-	c = getColorAtPixel(imgBuffer,x,y);
+	c = getColorAtPixel(x,y);
 	while (brightness(c) > brightnessValue) {
 		x++;
 		if (x >= width) return width-1;
-		c = getColorAtPixel(imgBuffer,x,y);
+		c = getColorAtPixel(x,y);
 	}
 	return x-1;
 }
 
 function getFirstBrightY(x,y) {
-	c = getColorAtPixel(imgBuffer,x,y);
+	c = getColorAtPixel(x,y);
 	if (y < height) {
 		while (brightness(c) < brightnessValue) {
 			y++;
 			if (y >= height) return -1;
-			c = getColorAtPixel(imgBuffer,x,y);
+			c = getColorAtPixel(x,y);
 		}
 	}
 	return y;
@@ -217,42 +219,21 @@ function getFirstBrightY(x,y) {
 
 function getNextDarkY(x,y) {
 	y++;
-	c = getColorAtPixel(imgBuffer,x,y);
+	c = getColorAtPixel(x,y);
 	if (y < height) {
 		while (brightness(c) > brightnessValue) {
 			y++;
 			if (y >= height) return height-1;
-			c = getColorAtPixel(imgBuffer,x,y);
+			c = getColorAtPixel(x,y);
 		}
 	}
 	return y-1;
 }
 
-function getColorAtPixel(image,x,y) {
-	var c = color(image.pixels[4*x + 4*y*image.width],    	  //r
-									image.pixels[4*x + 4*y*image.width + 1],	//g
-									image.pixels[4*x + 4*y*image.width + 2],  //b
-									image.pixels[4*x + 4*y*image.width + 3]); //a
+function getColorAtPixel(x,y) {
+	var c = color(img.pixels[4*x + 4*y*img.width],    	  //r
+									img.pixels[4*x + 4*y*img.width + 1],	//g
+									img.pixels[4*x + 4*y*img.width + 2],  //b
+									img.pixels[4*x + 4*y*img.width + 3]); //a
 	return c;
-}
-
-function loadBuffer(image) {
-	image.loadPixels();
-	imgBuffer.loadPixels();
-
-	for (var i = 0; i < image.pixels.length; i++) {
-		imgBuffer.pixels[i] = image.pixels[i];
-	}
-
-	imgBuffer.updatePixels();
-}
-
-function displayBuffer() {
-	imgDisplay.loadPixels();
-	imgBuffer.loadPixels();
-
-	for(var i = 0 ; i < img.pixels.length ; i++){
-		imgDisplay.pixels[i] = imgBuffer.pixels[i];	
-	}
-	imgDisplay.updatePixels();
 }
