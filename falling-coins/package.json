@@ -1,0 +1,27 @@
+{
+  "name": "falling-coins",
+  "version": "1.0.0",
+  "description": "it is a bunch of coins falling along to the music of bitcoins",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/catarak/generative-blockchain-art.git"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "three.js"
+  ],
+  "author": "Cassie Tarakajian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/catarak/generative-blockchain-art/issues"
+  },
+  "homepage": "https://github.com/catarak/generative-blockchain-art#readme",
+  "dependencies": {
+    "cannon": "^0.6.2",
+    "three.js": "^0.73.2"
+  }
+}

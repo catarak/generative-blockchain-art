@@ -22,6 +22,8 @@
 		var camera;
 		var cameraTarget;
 		var cameraControl;
+		var NUM_COINS = 200;
+		var coins = new Array(NUM_COINS);
 
 		function init() {
 			scene = new THREE.Scene();
@@ -42,22 +44,28 @@
 			var material = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
       var loader = new THREE.STLLoader();
       loader.load('./assets/B.stl', function(geometry) {
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( 0, - 0.37, - 0.6 );
-				// mesh.rotation.set( - Math.PI / 2, 0, 0 );
-				mesh.scale.set( 0.01, 0.01, 0.01 );
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+      	for (var i = 0; i < coins.length; i++) {
+      		coins[i] = new THREE.Mesh(geometry, material);
+      		var x = Math.random()*4 - 2.0;
+      		var y = Math.random()*6.2 - 1.2;
+      		var z = Math.random()*5 - 4;
+					coins[i].position.set( x, y, z );
+					coins[i].rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
+					coins[i].scale.set( 0.005, 0.005, 0.005 );
+					coins[i].castShadow = true;
+					coins[i].receiveShadow = true;
+					coins[i].rotationalVelocity = new THREE.Vector3(Math.random()*0.03,Math.random()*0.03,Math.random()*0.03);
+					scene.add( coins[i] );
+      	}
       });
 
       scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
-      addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+      addShadowedLight( 1, 1, 1, 0xffffff, 1.0 );
 			// addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
 			addShadowedLight( 0.5, 1, -1, 0xffffff, 1 );
 
-			var axisHelper = new THREE.AxisHelper( 5 );
-			scene.add( axisHelper );
+			// var axisHelper = new THREE.AxisHelper( 5 );
+			// scene.add( axisHelper );
 
       document.body.appendChild(renderer.domElement);
       render();
@@ -67,6 +75,15 @@
 			requestAnimationFrame(render);
 			renderer.render(scene, camera);
 			cameraControl.update();	
+			for (var i = 0; i < coins.length; i++) {
+				coins[i].position.y -= 0.004;
+				coins[i].rotation.x += coins[i].rotationalVelocity.x;
+				coins[i].rotation.y += coins[i].rotationalVelocity.y;
+				coins[i].rotation.z += coins[i].rotationalVelocity.z;
+				if (coins[i].position.y < -3) {
+					coins[i].position.y = 3;
+				}
+			}
 		}
 
 		function addShadowedLight( x, y, z, color, intensity ) {
