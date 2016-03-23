@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Cryptocurrency Art</title>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
+	<script src="scripts/STLLoader.js"></script>
+	<script src="scripts/OrbitControls.js"></script>
+	<style>
+		html, body {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      background:white;
+    }
+	</style>
+</head>
+<body>
+	<script>
+		var renderer;
+		var scene;
+		var camera;
+		var cameraTarget;
+		var cameraControl;
+
+		function init() {
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
+			camera.position.set( 0, 0.15, 3 );
+			cameraTarget = new THREE.Vector3( 0, 0, 0 );
+			camera.lookAt(cameraTarget);
+
+			cameraControl = new THREE.OrbitControls(camera);
+
+			renderer = new THREE.WebGLRenderer();
+      renderer.setClearColor(0x000000, 1.0);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMapEnabled = true;
+			
+			//it's GOLD
+			var material = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
+      var loader = new THREE.STLLoader();
+      loader.load('./assets/B.stl', function(geometry) {
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.set( 0, - 0.37, - 0.6 );
+				// mesh.rotation.set( - Math.PI / 2, 0, 0 );
+				mesh.scale.set( 0.01, 0.01, 0.01 );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+      });
+
+      scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+      addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+			// addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+			addShadowedLight( 0.5, 1, -1, 0xffffff, 1 );
+
+			var axisHelper = new THREE.AxisHelper( 5 );
+			scene.add( axisHelper );
+
+      document.body.appendChild(renderer.domElement);
+      render();
+		}
+
+		function render() {
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+			cameraControl.update();	
+		}
+
+		function addShadowedLight( x, y, z, color, intensity ) {
+				var directionalLight = new THREE.DirectionalLight( color, intensity );
+				directionalLight.position.set( x, y, z );
+				scene.add( directionalLight );
+				directionalLight.castShadow = true;
+				// directionalLight.shadowCameraVisible = true;
+				var d = 1;
+				directionalLight.shadowCameraLeft = -d;
+				directionalLight.shadowCameraRight = d;
+				directionalLight.shadowCameraTop = d;
+				directionalLight.shadowCameraBottom = -d;
+				directionalLight.shadowCameraNear = 1;
+				directionalLight.shadowCameraFar = 4;
+				directionalLight.shadowMapWidth = 1024;
+				directionalLight.shadowMapHeight = 1024;
+				directionalLight.shadowBias = -0.005;
+			}
+
+    function handleResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    window.onload = init;
+    window.addEventListener('resize', handleResize, false);
+	</script>
+</body>
+</html>
