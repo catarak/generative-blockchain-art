@@ -88,14 +88,19 @@
 			requestAnimationFrame(render);
 			renderer.render(scene, camera);
 			cameraControl.update();	
+			updateCoins();
+		}
+
+		function updateCoins() {
 			for (var i = 0; i < coins.length; i++) {
 				coins[i].position.y -= 0.004;
 				coins[i].rotation.x += coins[i].rotationalVelocity.x;
 				coins[i].rotation.y += coins[i].rotationalVelocity.y;
 				coins[i].rotation.z += coins[i].rotationalVelocity.z;
-				if (coins[i].position.y < -3) {
-					coins[i].position.y = 3;
-				}
+				//this prevents the coins from falling forever
+				// if (coins[i].position.y < -3) {
+				// 	coins[i].position.y = 3;
+				// }
 			}
 		}
 
@@ -130,7 +135,7 @@
 		  //add another coin
 		  var newCoin = new THREE.Mesh(coinGeometry, coinMaterial);
 		  var x = Math.random()*4 - 2.0;
-  		var y = Math.random()*6.2 - 1.2;
+  		var y = 3;
   		var z = Math.random()*5 - 4;
 			newCoin.position.set( x, y, z );
 			newCoin.rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
