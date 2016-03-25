@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Cryptocurrency Art</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
 	<script src="scripts/STLLoader.js"></script>
 	<script src="scripts/OrbitControls.js"></script>
@@ -17,13 +18,24 @@
 </head>
 <body>
 	<script>
+		//socket io stuff
+		var eventToListenTo = 'tx';
+		var room = 'inv';
+		var socket = io("https://blockexplorer.com/");
+		socket.on('connect', function() {
+		  // Join the room.
+		  socket.emit('subscribe', room);
+		});
+
 		var renderer;
 		var scene;
 		var camera;
 		var cameraTarget;
 		var cameraControl;
-		var NUM_COINS = 200;
+		var NUM_COINS = 0;
 		var coins = new Array(NUM_COINS);
+		var coinGeometry;
+		var coinMaterial;
 
 		function init() {
 			scene = new THREE.Scene();
@@ -41,11 +53,12 @@
       renderer.shadowMapEnabled = true;
 			
 			//it's GOLD
-			var material = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
+			coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
       var loader = new THREE.STLLoader();
       loader.load('./assets/B.stl', function(geometry) {
+      	coinGeometry = geometry;
       	for (var i = 0; i < coins.length; i++) {
-      		coins[i] = new THREE.Mesh(geometry, material);
+      		coins[i] = new THREE.Mesh(geometry, coinMaterial);
       		var x = Math.random()*4 - 2.0;
       		var y = Math.random()*6.2 - 1.2;
       		var z = Math.random()*5 - 4;
@@ -111,6 +124,23 @@
     }
     window.onload = init;
     window.addEventListener('resize', handleResize, false);
+
+    socket.on(eventToListenTo, function(data) {
+		  console.log("New transaction received: " + data.txid);
+		  //add another coin
+		  var newCoin = new THREE.Mesh(coinGeometry, coinMaterial);
+		  var x = Math.random()*4 - 2.0;
+  		var y = Math.random()*6.2 - 1.2;
+  		var z = Math.random()*5 - 4;
+			newCoin.position.set( x, y, z );
+			newCoin.rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
+			newCoin.scale.set( 0.005, 0.005, 0.005 );
+			newCoin.castShadow = true;
+			newCoin.receiveShadow = true;
+			newCoin.rotationalVelocity = new THREE.Vector3(Math.random()*0.03,Math.random()*0.03,Math.random()*0.03);
+			scene.add( newCoin );
+			coins.push(newCoin);
+		});
 	</script>
 </body>
 </html>
