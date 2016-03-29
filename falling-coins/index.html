@@ -6,6 +6,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
 	<script src="scripts/STLLoader.js"></script>
+	<script src="scripts/OBJLoader.js"></script>
 	<script src="scripts/OrbitControls.js"></script>
 	<style>
 		html, body {
@@ -34,8 +35,10 @@
 		var cameraControl;
 		var NUM_COINS = 0;
 		var coins = new Array(NUM_COINS);
-		var coinGeometry;
+		// var coinGeometry;
 		var coinMaterial;
+
+		var coinMesh;
 
 		function init() {
 			scene = new THREE.Scene();
@@ -47,24 +50,26 @@
 
 			cameraControl = new THREE.OrbitControls(camera);
 
-			renderer = new THREE.WebGLRenderer();
+			renderer = new THREE.WebGLRenderer({antialias: true});
       renderer.setClearColor(0x000000, 1.0);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.shadowMapEnabled = true;
 			
 			//it's GOLD
 			coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
-      var loader = new THREE.STLLoader();
-      loader.load('./assets/B.stl', function(geometry) {
-      	coinGeometry = geometry;
+      // var loader = new THREE.STLLoader();
+      var loader = new THREE.OBJLoader();
+      loader.load('./assets/Coin.obj', function(object) {
+      	coinMesh = object.children[0];
+      	coinMesh.material.setValues({ color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation });
       	for (var i = 0; i < coins.length; i++) {
-      		coins[i] = new THREE.Mesh(geometry, coinMaterial);
+      		coins[i] = coinMesh.clone();
       		var x = Math.random()*4 - 2.0;
       		var y = Math.random()*6.2 - 1.2;
       		var z = Math.random()*5 - 4;
 					coins[i].position.set( x, y, z );
 					coins[i].rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
-					coins[i].scale.set( 0.005, 0.005, 0.005 );
+					coins[i].scale.set( 0.3, 0.3, 0.3 );
 					coins[i].castShadow = true;
 					coins[i].receiveShadow = true;
 					coins[i].rotationalVelocity = new THREE.Vector3(Math.random()*0.03,Math.random()*0.03,Math.random()*0.03);
@@ -74,8 +79,8 @@
 
       scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
       addShadowedLight( 1, 1, 1, 0xffffff, 1.0 );
-			addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
-			// addShadowedLight( 0.5, 1, -1, 0xffffff, 1 );
+			// addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+			addShadowedLight( 0.5, 1, -1, 0xffffff, 1 );
 
 			// var axisHelper = new THREE.AxisHelper( 5 );
 			// scene.add( axisHelper );
@@ -133,13 +138,13 @@
     socket.on(eventToListenTo, function(data) {
 		  console.log("New transaction received: " + data.txid);
 		  //add another coin
-		  var newCoin = new THREE.Mesh(coinGeometry, coinMaterial);
+		  var newCoin = coinMesh.clone();
 		  var x = Math.random()*4 - 2.0;
   		var y = 3;
   		var z = Math.random()*5 - 4;
 			newCoin.position.set( x, y, z );
 			newCoin.rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
-			newCoin.scale.set( 0.005, 0.005, 0.005 );
+			newCoin.scale.set( 0.3, 0.3, 0.3 );
 			newCoin.castShadow = true;
 			newCoin.receiveShadow = true;
 			newCoin.rotationalVelocity = new THREE.Vector3(Math.random()*0.03,Math.random()*0.03,Math.random()*0.03);
