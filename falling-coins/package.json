@@ -1,0 +1,26 @@
+{
+  "name": "falling-coins",
+  "version": "1.0.0",
+  "description": "a falling coin thing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/catarak/generative-blockchain-art.git"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "art"
+  ],
+  "author": "Cassie Tarakajian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/catarak/generative-blockchain-art/issues"
+  },
+  "homepage": "https://github.com/catarak/generative-blockchain-art#readme",
+  "dependencies": {
+    "cannon": "^0.6.2"
+  }
+}

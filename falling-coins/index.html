@@ -8,6 +8,7 @@
 	<script src="scripts/STLLoader.js"></script>
 	<script src="scripts/OBJLoader.js"></script>
 	<script src="scripts/OrbitControls.js"></script>
+	<script src="scripts/cannon.min.js"></script>
 	<style>
 		html, body {
       overflow: hidden;
@@ -35,13 +36,24 @@
 		var cameraControl;
 		var NUM_COINS = 0;
 		var coins = new Array(NUM_COINS);
-		// var coinGeometry;
 		var coinMaterial;
-
 		var coinMesh;
 
+		//cannonjs stuff
+		var world;
+		var physicsCoins = new Array(NUM_COINS);
+
+		var time = new Date().getTime();
+		var dt;
+
 		function init() {
-			scene = new THREE.Scene();
+      initThree();
+     	initCannon();
+      render();
+		}
+
+		function initThree() {
+						scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 			camera.position.set( 0, 0.15, 3 );
@@ -67,7 +79,7 @@
       		var x = Math.random()*4 - 2.0;
       		var y = Math.random()*6.2 - 1.2;
       		var z = Math.random()*5 - 4;
-					coins[i].position.set( x, y, z );
+					// coins[i].position.set( x, y, z );
 					coins[i].rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
 					coins[i].scale.set( 0.3, 0.3, 0.3 );
 					coins[i].castShadow = true;
@@ -86,16 +98,42 @@
 			// scene.add( axisHelper );
 
       document.body.appendChild(renderer.domElement);
-      render();
+		}
+
+		function initCannon() {
+			world = new CANNON.World();
+			// world.gravity.set(0, -9.82, 0);
+			world.gravity.set(0, -0.05, 0);
+
+			for (var i = 0; i < physicsCoins.length; i++) {
+				// var shape = new CANNON.Cylinder(0.649, 0.649, 0.157, 100);
+				var shape = new CANNON.Cylinder(0.1947, 0.1947, 0.0471, 100);
+				var mass = 1;
+				var x = Math.random()*4 - 2.0;
+    		// var y = Math.random()*6.2 - 1.2;
+    		var y = 3;
+    		var z = Math.random()*5 - 4;
+				physicsCoins[i] = new CANNON.Body({
+					mass: 1,
+					position: new CANNON.Vec3(x,y,z)
+				});
+				physicsCoins[i].addShape(shape);
+				world.addBody(physicsCoins[i]);
+			}
 		}
 
 		function render() {
 			requestAnimationFrame(render);
+			var now = new Date().getTime();
+			dt = (now - time)/1000;
+			time = now;
+
 			renderer.render(scene, camera);
 			cameraControl.update();	
-			updateCoins();
+			updatePhysics();
 		}
 
+		//fake physics
 		function updateCoins() {
 			for (var i = 0; i < coins.length; i++) {
 				coins[i].position.y -= 0.004;
@@ -106,6 +144,17 @@
 				// if (coins[i].position.y < -3) {
 				// 	coins[i].position.y = 3;
 				// }
+			}
+		}
+
+		function updatePhysics() {
+			world.step(dt);
+
+			for (var i = 0; i < coins.length; i++) {
+				if (physicsCoins[i]) {
+					coins[i].position.copy(physicsCoins[i].position);
+					coins[i].quaternion.copy(physicsCoins[i].quaternion);
+				}
 			}
 		}
 
@@ -139,17 +188,26 @@
 		  console.log("New transaction received: " + data.txid);
 		  //add another coin
 		  var newCoin = coinMesh.clone();
-		  var x = Math.random()*4 - 2.0;
-  		var y = 3;
-  		var z = Math.random()*5 - 4;
-			newCoin.position.set( x, y, z );
-			newCoin.rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
+			newCoin.position.set( 0, 10, 0 );
 			newCoin.scale.set( 0.3, 0.3, 0.3 );
 			newCoin.castShadow = true;
 			newCoin.receiveShadow = true;
-			newCoin.rotationalVelocity = new THREE.Vector3(Math.random()*0.03,Math.random()*0.03,Math.random()*0.03);
 			scene.add( newCoin );
 			coins.push(newCoin);
+
+			var shape = new CANNON.Cylinder(0.1947, 0.1947, 0.0471, 100);
+			var x = Math.random()*4 - 2.0;
+  		// var y = Math.random()*6.2 - 1.2;
+  		var y = 3;
+  		var z = Math.random()*5 - 4;
+			var body = new CANNON.Body({
+				mass: 1,
+				position: new CANNON.Vec3(x,y,z)
+			});
+			body.addShape(shape);
+			body.angularVelocity.set(Math.random()*2,Math.random()*2,Math.random()*2);
+			world.addBody(body);
+			physicsCoins.push(body);
 		});
 	</script>
 </body>
