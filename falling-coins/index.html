@@ -46,6 +46,12 @@
 		var time = new Date().getTime();
 		var dt;
 
+		//cylinder collider testing stuff
+		var cylinders = new Array(NUM_COINS);
+		var cylinderGeometry = new THREE.CylinderGeometry( 0.20, 0.20, 0.07, 64 );
+		var cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+
 		function init() {
       initThree();
      	initCannon();
@@ -69,11 +75,12 @@
 			
 			//it's GOLD
 			coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
+			var silverMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess:50, combine: THREE.MultiplyOperation } );
       // var loader = new THREE.STLLoader();
       var loader = new THREE.OBJLoader();
-      loader.load('./assets/Coin.obj', function(object) {
+      loader.load('./assets/NewCoin-5.obj', function(object) {
       	coinMesh = object.children[0];
-      	coinMesh.material.setValues({ color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation });
+      	coinMesh.material.setValues({ color: 0xffffff, specular:0xffffff, shininess: 50, combine: THREE.MultiplyOperation });
       	for (var i = 0; i < coins.length; i++) {
       		coins[i] = coinMesh.clone();
       		var x = Math.random()*4 - 2.0;
@@ -81,7 +88,7 @@
       		var z = Math.random()*5 - 4;
 					// coins[i].position.set( x, y, z );
 					coins[i].rotation.set(Math.random()*2*Math.PI, Math.random()*2*Math.PI, Math.random()*2*Math.PI);
-					coins[i].scale.set( 0.3, 0.3, 0.3 );
+					//coins[i].scale.set( 0.3, 0.3, 0.3 );
 					coins[i].castShadow = true;
 					coins[i].receiveShadow = true;
 					coins[i].rotationalVelocity = new THREE.Vector3(Math.random()*0.03,Math.random()*0.03,Math.random()*0.03);
@@ -156,6 +163,9 @@
 				if (physicsCoins[i]) {
 					coins[i].position.copy(physicsCoins[i].position);
 					coins[i].quaternion.copy(physicsCoins[i].quaternion);
+
+					// cylinders[i].position.copy(physicsCoins[i].position);
+					// cylinders[i].quaternion.copy(physicsCoins[i].quaternion);
 				}
 			}
 		}
@@ -196,9 +206,16 @@
 			newCoin.receiveShadow = true;
 			scene.add( newCoin );
 			coins.push(newCoin);
+
+			// var newCylinder = cylinderMesh.clone();
+			// newCylinder.castShadow = true;
+			// newCylinder.receiveShadow = true;
+			// scene.add( newCylinder );
+			// cylinders.push(newCylinder);
+
 			
 			// var shape = new CANNON.Cylinder(0.1947, 0.1947, 0.0471, 100);
-			var shape = new CANNON.Cylinder(0.22, 0.22, 0.08, 100);
+			var shape = new CANNON.Cylinder(0.20, 0.20, 0.07, 64);
 			var x = Math.random()*4 - 2.0;
   		// var y = Math.random()*6.2 - 1.2;
   		var y = 3;
