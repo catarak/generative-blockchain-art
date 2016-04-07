@@ -19,6 +19,9 @@
 	</style>
 </head>
 <body>
+	<video id="video" autoplay loop style="display:none">
+			<source src="assets/cat.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+	</video>
 	<script>
 		//socket io stuff
 		var eventToListenTo = 'tx';
@@ -59,10 +62,10 @@
 		}
 
 		function initThree() {
-						scene = new THREE.Scene();
+			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
-			camera.position.set( 0, 0.15, 3 );
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.set( 0, 0, 3 );
 			cameraTarget = new THREE.Vector3( 0, 0, 0 );
 			camera.lookAt(cameraTarget);
 
@@ -103,6 +106,20 @@
 
 			// var axisHelper = new THREE.AxisHelper( 5 );
 			// scene.add( axisHelper );
+
+			var video = document.getElementById( 'video' );
+			texture = new THREE.VideoTexture( video );
+			texture.minFilter = THREE.LinearFilter;
+			texture.magFilter = THREE.LinearFilter;
+			texture.format = THREE.RGBFormat;
+
+			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true, side:THREE.DoubleSide } );
+
+			var videoGeometry = new THREE.PlaneGeometry( 175, 100, 1, 1 );
+
+			var videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+			videoMesh.position.z = -150;
+			scene.add(videoMesh);
 
       document.body.appendChild(renderer.domElement);
 		}
