@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Video Texture Test</title>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
+	<style>
+		html, body {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      background:white;
+    }
+	</style>
+</head>
+<body>
+	<video id="video" autoplay loop style="display:none">
+			<source src="assets/cat.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+	</video>
+	<script>
+		var renderer;
+		var scene;
+		var camera;
+
+		function init() {
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.set( 0, 0, 3 );
+			camera.lookAt(scene.position);
+
+			renderer = new THREE.WebGLRenderer({antialias: true});
+      renderer.setClearColor(0x000000, 1.0);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMapEnabled = true;
+
+   //    var light = new THREE.DirectionalLight( 0xffffff );
+			// light.position.set( 0.5, 1, 1 ).normalize();
+			// scene.add( light );
+
+			var frameGeo = new THREE.CubeGeometry(120, 120, 20);
+			var frameMat = new THREE.MeshLambertMaterial( {color:0x888888, emissive:0x000011} );
+			var frameMesh = new THREE.Mesh( frameGeo, frameMat );
+			scene.add(frameMesh);
+
+			var video = document.getElementById( 'video' );
+			texture = new THREE.VideoTexture( video );
+			texture.minFilter = THREE.LinearFilter;
+			texture.magFilter = THREE.LinearFilter;
+			texture.format = THREE.RGBFormat;
+
+			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true, side:THREE.DoubleSide } );
+
+			var videoGeometry = new THREE.PlaneGeometry( 100, 100, 1, 1 );
+
+			var videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+			videoMesh.position.z = -156;
+			scene.add(videoMesh);
+			
+			document.body.appendChild(renderer.domElement);
+			render();
+		}
+
+		function render() {
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		}
+
+		function handleResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+		window.onload = init;
+    window.addEventListener('resize', handleResize, false);
+	</script>
+</body>
+</html>
