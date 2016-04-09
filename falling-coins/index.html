@@ -9,6 +9,7 @@
 	<script src="scripts/OBJLoader.js"></script>
 	<script src="scripts/OrbitControls.js"></script>
 	<script src="scripts/cannon.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
 	<style>
 		html, body {
       overflow: hidden;
@@ -37,6 +38,9 @@
 		var camera;
 		var cameraTarget;
 		var cameraControl;
+
+		var videoCamera;
+
 		var NUM_COINS = 0;
 		var coins = new Array(NUM_COINS);
 		var coinMaterial;
@@ -55,6 +59,10 @@
 		var cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
 		var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
+		var renderWidth, renderHeight;
+
+		var mode = 0;
+
 		function init() {
       initThree();
      	initCannon();
@@ -62,18 +70,24 @@
 		}
 
 		function initThree() {
+			var renderWidth = window.innerWidth;
+			var renderHeight = window.innerHeight;
+
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera = new THREE.PerspectiveCamera( 35, renderWidth/2 / renderHeight, 1, 1000 );
 			camera.position.set( 0, 0, 3 );
 			cameraTarget = new THREE.Vector3( 0, 0, 0 );
 			camera.lookAt(cameraTarget);
+
+			videoCamera = new THREE.PerspectiveCamera(35, renderWidth/2 /renderHeight, 1, 1000);
+			videoCamera.position.set(200, 0, 3);
 
 			cameraControl = new THREE.OrbitControls(camera);
 
 			renderer = new THREE.WebGLRenderer({antialias: true});
       renderer.setClearColor(0x000000, 1.0);
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(renderWidth, renderHeight);
       renderer.shadowMapEnabled = true;
 			
 			//it's GOLD
@@ -119,9 +133,11 @@
 
 			var videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 			videoMesh.position.z = -150;
+			videoMesh.position.x = 200;
 			scene.add(videoMesh);
 
       document.body.appendChild(renderer.domElement);
+
 		}
 
 		function initCannon() {
@@ -153,10 +169,31 @@
 			var now = new Date().getTime();
 			dt = (now - time)/1000;
 			time = now;
-
+			
+			//render two views
+			var left   = Math.floor( renderWidth  * 0 );
+			var bottom = Math.floor( renderHeight * 0 );
+			var width  = Math.floor( renderWidth  * 0.5);
+			var height = Math.floor( renderHeight * 1 );
+			renderer.setViewport( left, bottom, width, height );
+			renderer.setScissor( left, bottom, width, height );
+			renderer.setScissorTest( true );
 			renderer.render(scene, camera);
+
+			left   = Math.floor( renderWidth  * 0.5 );
+			bottom = Math.floor( renderHeight * 0 );
+			width  = Math.floor( renderWidth  * 0.5);
+			height = Math.floor( renderHeight * 1 );
+			renderer.setViewport( left, bottom, width, height );
+			renderer.setScissor( left, bottom, width, height );
+			renderer.setScissorTest( true );
+			renderer.render(scene, videoCamera);
+
+
+
 			cameraControl.update();	
 			updatePhysics();
+			updateSceneFromMode();
 		}
 
 		//fake physics
@@ -206,12 +243,19 @@
 			}
 
     function handleResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
+    		renderWidth = window.innerWidth;
+    		renderHeight = window.innerHeight;
+        camera.aspect = renderWidth/2 / renderHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        videoCamera.aspect = renderWidth/2 / renderHeight;
+        videoCamera.updateProjectionMatrix();
+        renderer.setSize(renderWidth, renderHeight);
     }
     window.onload = init;
     window.addEventListener('resize', handleResize, false);
+
+		//it is unknown why this works
+    setTimeout(handleResize, 100);
 
     socket.on(eventToListenTo, function(data) {
 		  console.log("New transaction received: " + data.txid);
@@ -246,6 +290,35 @@
 			world.addBody(body);
 			physicsCoins.push(body);
 		});
+
+		//change mode on keypress
+		$(function() {
+			$("document").keydown(function(e) {
+				switch (e.keyCode) {
+					case 48: //0
+						mode = 0;
+						break;
+					case 49: //1
+						mode = 1;
+						break;
+					case 50: //2
+						mode = 2;
+						break;
+					case 51: //3
+						mode = 3;
+						break;
+					default:
+						break;
+				}
+			});
+		});
+
+		function updateSceneFromMode() {
+			// switch (mode) {
+			// 	case 0: 
+					
+			// }
+		}
 	</script>
 </body>
 </html>

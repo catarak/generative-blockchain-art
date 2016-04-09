@@ -34,15 +34,6 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.shadowMapEnabled = true;
 
-   //    var light = new THREE.DirectionalLight( 0xffffff );
-			// light.position.set( 0.5, 1, 1 ).normalize();
-			// scene.add( light );
-
-			var frameGeo = new THREE.CubeGeometry(120, 120, 20);
-			var frameMat = new THREE.MeshLambertMaterial( {color:0x888888, emissive:0x000011} );
-			var frameMesh = new THREE.Mesh( frameGeo, frameMat );
-			scene.add(frameMesh);
-
 			var video = document.getElementById( 'video' );
 			texture = new THREE.VideoTexture( video );
 			texture.minFilter = THREE.LinearFilter;
