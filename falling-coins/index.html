@@ -62,6 +62,7 @@
 		var renderWidth, renderHeight;
 
 		var mode = 0;
+		var videoMesh;
 
 		function init() {
       initThree();
@@ -131,8 +132,9 @@
 
 			var videoGeometry = new THREE.PlaneGeometry( 175, 100, 1, 1 );
 
-			var videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+			videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 			videoMesh.position.z = -150;
+			videoMesh.name = "videoMesh";
 			videoMesh.position.x = 200;
 			scene.add(videoMesh);
 
@@ -169,27 +171,53 @@
 			var now = new Date().getTime();
 			dt = (now - time)/1000;
 			time = now;
-			
-			//render two views
-			var left   = Math.floor( renderWidth  * 0 );
-			var bottom = Math.floor( renderHeight * 0 );
-			var width  = Math.floor( renderWidth  * 0.5);
-			var height = Math.floor( renderHeight * 1 );
-			renderer.setViewport( left, bottom, width, height );
-			renderer.setScissor( left, bottom, width, height );
-			renderer.setScissorTest( true );
-			renderer.render(scene, camera);
 
-			left   = Math.floor( renderWidth  * 0.5 );
-			bottom = Math.floor( renderHeight * 0 );
-			width  = Math.floor( renderWidth  * 0.5);
-			height = Math.floor( renderHeight * 1 );
-			renderer.setViewport( left, bottom, width, height );
-			renderer.setScissor( left, bottom, width, height );
-			renderer.setScissorTest( true );
-			renderer.render(scene, videoCamera);
+			if (mode === 0 || mode === 1) {
+				var mainLeft   = Math.floor( renderWidth  * 0 );
+				var mainBottom = Math.floor( renderHeight * 0 );
+				var mainWidth  = Math.floor( renderWidth  * 1 );
+				var mainHeight = Math.floor( renderHeight * 1 );
+				renderer.setViewport( mainLeft, mainBottom, mainWidth, mainHeight );
+				renderer.setScissor( mainLeft, mainBottom, mainWidth, mainHeight );
+				renderer.setScissorTest( true );
+				renderer.render(scene, camera);
+			}
+			else if (mode === 2 || mode === 3) {
+				var mainLeft, mainBottom, mainWidth, mainHeight;
+				var videoLeft, videoBottom, videoWidth, videoHeight;
+				if (mode === 2) {
+					mainLeft   = Math.floor( renderWidth  * 0 );
+					mainBottom = Math.floor( renderHeight * 0 );
+					mainWidth  = Math.floor( renderWidth  * 0.5);
+					mainHeight = Math.floor( renderHeight * 1 );
+					
+					videoLeft   = Math.floor( renderWidth  * 0.5 );
+					videoBottom = Math.floor( renderHeight * 0 );
+					videoWidth  = Math.floor( renderWidth  * 0.5);
+					videoHeight = Math.floor( renderHeight * 1 );
+				}
+				else {
+					videoLeft   = Math.floor( renderWidth  * 0 );
+					videoBottom = Math.floor( renderHeight * 0 );
+					videoWidth  = Math.floor( renderWidth  * 0.5);
+					videoHeight = Math.floor( renderHeight * 1 );
+					
+					mainLeft   = Math.floor( renderWidth  * 0.5 );
+					mainBottom = Math.floor( renderHeight * 0 );
+					mainWidth  = Math.floor( renderWidth  * 0.5);
+					mainHeight = Math.floor( renderHeight * 1 );
+				}
 
+				renderer.setViewport( mainLeft, mainBottom, mainWidth, mainHeight );
+				renderer.setScissor( mainLeft, mainBottom, mainWidth, mainHeight );
+				renderer.setScissorTest( true );
+				renderer.render(scene, camera);
 
+				renderer.setViewport( videoLeft, videoBottom, videoWidth, videoHeight );
+				renderer.setScissor( videoLeft, videoBottom, videoWidth, videoHeight );
+				renderer.setScissorTest( true );
+				renderer.render(scene, videoCamera);
+			}
 
 			cameraControl.update();	
 			updatePhysics();
@@ -245,9 +273,16 @@
     function handleResize() {
     		renderWidth = window.innerWidth;
     		renderHeight = window.innerHeight;
-        camera.aspect = renderWidth/2 / renderHeight;
+    		console.log(mode);
+    		if (mode === 0 || mode === 1) {
+    			camera.aspect = renderWidth / renderHeight;
+    			videoCamera.aspect = renderWidth / renderHeight;
+    		}
+    		else if (mode === 2 || mode === 3) {
+					camera.aspect = renderWidth/2 / renderHeight;
+					videoCamera.aspect = renderWidth/2 / renderHeight;
+    		}
         camera.updateProjectionMatrix();
-        videoCamera.aspect = renderWidth/2 / renderHeight;
         videoCamera.updateProjectionMatrix();
         renderer.setSize(renderWidth, renderHeight);
     }
@@ -293,7 +328,7 @@
 
 		//change mode on keypress
 		$(function() {
-			$("document").keydown(function(e) {
+			$(document).keydown(function(e) {
 				switch (e.keyCode) {
 					case 48: //0
 						mode = 0;
@@ -310,14 +345,38 @@
 					default:
 						break;
 				}
+				handleResize();
 			});
 		});
 
 		function updateSceneFromMode() {
-			// switch (mode) {
-			// 	case 0: 
-					
-			// }
+			switch (mode) {
+				case 0: 
+					if (scene.getObjectByName("videoMesh")) {
+						scene.remove(videoMesh);
+					}
+					break;
+				case 1:
+					if (!scene.getObjectByName("videoMesh")) {
+						scene.add(videoMesh);
+					}
+					videoMesh.position.x = 0;
+					break;
+				case 2: 
+					if (!scene.getObjectByName("videoMesh")) {
+						scene.add(videoMesh);
+					}
+					videoMesh.position.x = 200;
+					break;
+				case 3:
+					if (!scene.getObjectByName("videoMesh")) {
+						scene.add(videoMesh);
+					}
+					videoMesh.position.x = 200;
+					break;
+				default:
+					break;
+			}
 		}
 	</script>
 </body>
