@@ -323,7 +323,7 @@
     window.addEventListener('resize', handleResize, false);
 
 		//it is unknown why this works
-    setTimeout(handleResize, 50);
+    setTimeout(handleResize, 500);
 
     socket.on(eventToListenTo, function(data) {
 		  console.log("New transaction received: " + data.txid);
