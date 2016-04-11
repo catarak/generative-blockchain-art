@@ -40,6 +40,15 @@
 	    height: 100%;
 	    width: 100%;
     }
+
+    .video-modal-input {
+    	font-size: 16px;
+    	width: 400px;
+    }
+
+    .video-modal-submit {
+    	font-size: 16px;
+    }
 	</style>
 </head>
 <body>
@@ -49,8 +58,8 @@
 	<div id="video-modal" class="video-modal hide">
 		<div class="video-modal-inner">
 			<form type="submit" id="video-source-form">
-				<input type="text" placeholder="Video source url">
-				<button type="submit">Save</button>
+				<input class="video-modal-input" id="video-url" type="text" placeholder="Video source url">
+				<button class="video-modal-submit" type="submit">Save</button>
 			</form>
 		</div>
 	</div>
@@ -390,16 +399,19 @@
 				e.preventDefault();
 				newVideoUpload = true;
 				var videoUrl = $(e.target).children("input").val();
-				$("body").prepend('<video autoplay loop style="display:none" crossorigin="anonymous">' + 
-					'<source src="' + videoUrl + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></video>');
-				$("video")[0].addEventListener('canplay', function createVideo(e) {
-					createVideoMesh(this);
-					$($("video")[1]).remove();
-					this.removeEventListener('canplay', createVideo, false);
-				}, false);
-				// $("#video").children("source").attr("src", videoUrl);
-				// $("#video")[0].load();
-				toggleVideoSourceModal();
+				if (videoUrl.match(/^https?:\/\/.*gif$/)) {
+					toggleVideoSourceModal();
+					$.get("https://upload.gfycat.com/transcode?fetchUrl=" + videoUrl, function(response) {
+							createVideoElement(response.mp4Url);
+					});
+				}
+				else if (videoUrl.match(/^https?:\/\/.*mp4$/)) {
+					createVideoElement(videoUrl);
+					toggleVideoSourceModal();
+				}
+				else {
+					//error, unrecognized format
+				}
 			});
 		});
 
@@ -436,10 +448,11 @@
 		function toggleVideoSourceModal() {
 			$("#video-modal").toggleClass("hide");
 			videoModalActive = !videoModalActive;
+			$("#video-url").val('');
 		}
 
 		function createVideoMesh(videoElement) {
-			texture = new THREE.VideoTexture( videoElement );
+			var texture = new THREE.VideoTexture( videoElement );
 			texture.minFilter = THREE.LinearFilter;
 			texture.magFilter = THREE.LinearFilter;
 			texture.format = THREE.RGBFormat;
@@ -458,6 +471,16 @@
 			videoMesh.name = "videoMesh";
 			videoMesh.position.x = 200;
 			scene.add(videoMesh);
+		}
+
+		function createVideoElement(videoUrl) {
+			$("body").prepend('<video autoplay loop style="display:none" crossorigin="anonymous">' + 
+					'<source src="' + videoUrl + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></video>');
+			$("video")[0].addEventListener('canplay', function createVideo(e) {
+				createVideoMesh(this);
+				$($("video")[1]).remove();
+				this.removeEventListener('canplay', createVideo, false);
+			}, false);
 		}
 	</script>
 </body>
