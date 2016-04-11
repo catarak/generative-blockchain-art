@@ -10,8 +10,6 @@
 	<script src="scripts/OrbitControls.js"></script>
 	<script src="scripts/cannon.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-	<script src="scripts/dropzone.js"></script>
-	<link rel="stylesheet" href="styles/dropzone.css">
 	<style>
 		html, body {
       overflow: hidden;
@@ -52,9 +50,9 @@
 	</style>
 </head>
 <body>
-	<video id="video" autoplay loop style="display:none" crossorigin="anonymous">
+<!-- 	<video id="video" autoplay loop style="display:none" crossorigin="anonymous">
 			<source src="assets/cat.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-	</video>
+	</video> -->
 	<div id="video-modal" class="video-modal hide">
 		<div class="video-modal-inner">
 			<form type="submit" id="video-source-form">
@@ -165,11 +163,16 @@
 			// var axisHelper = new THREE.AxisHelper( 5 );
 			// scene.add( axisHelper );
 
-			var video = document.getElementById( 'video' );
-			video.addEventListener('canplay', function createVideo(e) {
-					createVideoMesh(this);
-					this.removeEventListener('canplay', createVideo, false);
-				}, false);
+			// var video = document.getElementById( 'video' );
+			// video.addEventListener('canplay', function createVideo(e) {
+			// 		createVideoMesh(this);
+			// 		this.removeEventListener('canplay', createVideo, false);
+			// 	}, false);
+
+			$.get('/api/currentVideo', function(response) {
+				var videoUrl = response.url;
+				createVideoElement(videoUrl);
+			});
 
       document.body.appendChild(renderer.domElement);
 
@@ -402,10 +405,14 @@
 				if (videoUrl.match(/^https?:\/\/.*gif$/)) {
 					toggleVideoSourceModal();
 					$.get("https://upload.gfycat.com/transcode?fetchUrl=" + videoUrl, function(response) {
-							createVideoElement(response.mp4Url);
+							if (response.mp4Url) {
+								$.post('/api/currentVideo', {url: response.mp4Url});
+								createVideoElement(response.mp4Url);
+							}
 					});
 				}
 				else if (videoUrl.match(/^https?:\/\/.*mp4$/)) {
+					$.post('/api/currentVideo', {url: videoUrl});
 					createVideoElement(videoUrl);
 					toggleVideoSourceModal();
 				}
