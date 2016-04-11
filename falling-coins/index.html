@@ -157,27 +157,10 @@
 			// scene.add( axisHelper );
 
 			var video = document.getElementById( 'video' );
-			texture = new THREE.VideoTexture( video );
-			texture.minFilter = THREE.LinearFilter;
-			texture.magFilter = THREE.LinearFilter;
-			texture.format = THREE.RGBFormat;
-
-			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true, side:THREE.DoubleSide } );
-
-			var videoGeometry = new THREE.PlaneGeometry( 175, 100, 1, 1 );
-
-			videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-			videoMesh.position.z = -150;
-			videoMesh.name = "videoMesh";
-			videoMesh.position.x = 200;
-			scene.add(videoMesh);
-
-			// //resize video after source changes
-			// video.addEventListener( "loadedmetadata", function (e) {
-			// 		debugger;
-			//     var width = this.videoWidth,
-			//         height = this.videoHeight;
-			// }, false );
+			video.addEventListener('canplay', function createVideo(e) {
+					createVideoMesh(this);
+					this.removeEventListener('canplay', createVideo, false);
+				}, false);
 
       document.body.appendChild(renderer.domElement);
 
@@ -456,7 +439,6 @@
 		}
 
 		function createVideoMesh(videoElement) {
-			debugger;
 			texture = new THREE.VideoTexture( videoElement );
 			texture.minFilter = THREE.LinearFilter;
 			texture.magFilter = THREE.LinearFilter;
