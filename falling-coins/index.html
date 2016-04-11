@@ -10,6 +10,8 @@
 	<script src="scripts/OrbitControls.js"></script>
 	<script src="scripts/cannon.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+	<script src="scripts/dropzone.js"></script>
+	<link rel="stylesheet" href="styles/dropzone.css">
 	<style>
 		html, body {
       overflow: hidden;
@@ -17,12 +19,41 @@
       padding: 0;
       background:white;
     }
+
+    .hide {
+			display: none;
+    }
+
+    .video-modal {
+    	position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .video-modal-inner {
+    	display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    height: 100%;
+	    width: 100%;
+    }
 	</style>
 </head>
 <body>
 	<video id="video" autoplay loop style="display:none">
 			<source src="assets/cat.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 	</video>
+	<div id="video-modal" class="video-modal hide">
+		<div class="video-modal-inner">
+			<form type="submit" id="video-source-form">
+				<input type="text" placeholder="Video source url">
+				<button type="submit">Save</button>
+			</form>
+		</div>
+	</div>
 	<script>
 		//socket io stuff
 		var eventToListenTo = 'tx';
@@ -64,6 +95,8 @@
 		var mode = 0;
 		var videoMesh;
 
+		var videoModalActive = false;
+
 		function init() {
       initThree();
      	initCannon();
@@ -84,7 +117,7 @@
 			videoCamera = new THREE.PerspectiveCamera(35, renderWidth/2 /renderHeight, 1, 1000);
 			videoCamera.position.set(200, 0, 3);
 
-			cameraControl = new THREE.OrbitControls(camera);
+			// cameraControl = new THREE.OrbitControls(camera);
 
 			renderer = new THREE.WebGLRenderer({antialias: true});
       renderer.setClearColor(0x000000, 1.0);
@@ -219,7 +252,7 @@
 				renderer.render(scene, videoCamera);
 			}
 
-			cameraControl.update();	
+			//cameraControl.update();	
 			updatePhysics();
 			updateSceneFromMode();
 		}
@@ -329,23 +362,44 @@
 		//change mode on keypress
 		$(function() {
 			$(document).keydown(function(e) {
-				switch (e.keyCode) {
-					case 48: //0
-						mode = 0;
-						break;
-					case 49: //1
-						mode = 1;
-						break;
-					case 50: //2
-						mode = 2;
-						break;
-					case 51: //3
-						mode = 3;
-						break;
-					default:
-						break;
+				if (!videoModalActive) {
+					switch (e.keyCode) {
+						case 48: //0
+							mode = 0;
+							break;
+						case 49: //1
+							mode = 1;
+							break;
+						case 50: //2
+							mode = 2;
+							break;
+						case 51: //3
+							mode = 3;
+							break;
+						case 86: //v
+							toggleVideoSourceModal();
+							break;
+						default:
+							break;
+					}
+				}
+				else {
+					switch (e.keyCode) {
+						case 27: //escape
+							toggleVideoSourceModal();
+							break;
+						default:
+							break;
+					}
 				}
 				handleResize();
+			});
+
+			$("#video-source-form").submit(function(e) {
+				e.preventDefault();
+				var videoUrl = $(e.target).children("input").val();
+				$("#video").children("source").attr("src", videoUrl);
+				toggleVideoSourceModal();
 			});
 		});
 
@@ -377,6 +431,11 @@
 				default:
 					break;
 			}
+		}
+
+		function toggleVideoSourceModal() {
+			$("#video-modal").toggleClass("hide");
+			videoModalActive = !videoModalActive;
 		}
 	</script>
 </body>
