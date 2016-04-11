@@ -43,7 +43,7 @@
 	</style>
 </head>
 <body>
-	<video id="video" autoplay loop style="display:none">
+	<video id="video" autoplay loop style="display:none" crossorigin="anonymous">
 			<source src="assets/cat.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 	</video>
 	<div id="video-modal" class="video-modal hide">
@@ -96,6 +96,7 @@
 		var videoMesh;
 
 		var videoModalActive = false;
+		var newVideoUpload = false;
 
 		function init() {
       initThree();
@@ -170,6 +171,13 @@
 			videoMesh.name = "videoMesh";
 			videoMesh.position.x = 200;
 			scene.add(videoMesh);
+
+			// //resize video after source changes
+			// video.addEventListener( "loadedmetadata", function (e) {
+			// 		debugger;
+			//     var width = this.videoWidth,
+			//         height = this.videoHeight;
+			// }, false );
 
       document.body.appendChild(renderer.domElement);
 
@@ -397,8 +405,17 @@
 
 			$("#video-source-form").submit(function(e) {
 				e.preventDefault();
+				newVideoUpload = true;
 				var videoUrl = $(e.target).children("input").val();
-				$("#video").children("source").attr("src", videoUrl);
+				$("body").prepend('<video autoplay loop style="display:none" crossorigin="anonymous">' + 
+					'<source src="' + videoUrl + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></video>');
+				$("video")[0].addEventListener('canplay', function createVideo(e) {
+					createVideoMesh(this);
+					$($("video")[1]).remove();
+					this.removeEventListener('canplay', createVideo, false);
+				}, false);
+				// $("#video").children("source").attr("src", videoUrl);
+				// $("#video")[0].load();
 				toggleVideoSourceModal();
 			});
 		});
@@ -436,6 +453,29 @@
 		function toggleVideoSourceModal() {
 			$("#video-modal").toggleClass("hide");
 			videoModalActive = !videoModalActive;
+		}
+
+		function createVideoMesh(videoElement) {
+			debugger;
+			texture = new THREE.VideoTexture( videoElement );
+			texture.minFilter = THREE.LinearFilter;
+			texture.magFilter = THREE.LinearFilter;
+			texture.format = THREE.RGBFormat;
+
+			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true, side:THREE.DoubleSide } );
+
+			var videoHeight = videoElement.videoWidth/videoElement.videoHeight * 100;
+			var videoGeometry = new THREE.PlaneGeometry( videoHeight, 100, 1, 1 );
+
+			//check if videoMesh is currently in the scene
+			if (scene.getObjectByName("videoMesh")) {
+				scene.remove(videoMesh);
+			}
+			videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+			videoMesh.position.z = -150;
+			videoMesh.name = "videoMesh";
+			videoMesh.position.x = 200;
+			scene.add(videoMesh);
 		}
 	</script>
 </body>
