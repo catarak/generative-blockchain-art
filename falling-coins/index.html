@@ -466,15 +466,17 @@
 
 			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true, side:THREE.DoubleSide } );
 
-			var videoHeight = videoElement.videoWidth/videoElement.videoHeight * 100;
-			var videoGeometry = new THREE.PlaneGeometry( videoHeight, 100, 1, 1 );
+			var videoWidth = videoElement.videoWidth/videoElement.videoHeight * 100;
+			// var videoGeometry = new THREE.PlaneGeometry( videoWidth, 100);
+			var videoGeometry = new THREE.PlaneGeometry( videoWidth, 100);
 
 			//check if videoMesh is currently in the scene
 			if (scene.getObjectByName("videoMesh")) {
 				scene.remove(videoMesh);
 			}
 			videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-			videoMesh.position.z = -114;
+			// videoMesh.position.z = -150;
+			videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
 			videoMesh.name = "videoMesh";
 			videoMesh.position.x = 200;
 			scene.add(videoMesh);
