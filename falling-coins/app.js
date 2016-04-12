@@ -31,6 +31,17 @@ app.post('/api/currentVideo', function(req, res) {
 	res.send(Videos.get(1));
 });
 
+app.get('/api/videos', function(req, res) {
+	var Videos = db.getCollection('videos');
+	Videos.find({});
+});
+
+app.delete('/api/videos/:id(\\d+)/', function(req, res) {
+  var videoId = req.param.id;
+  var Videos = db.getCollection('videos');
+  Videos.remove(req.param.id);
+});
+
 app.listen(8080, function () {
   console.log('Example app listening on port 8080!');
 });
