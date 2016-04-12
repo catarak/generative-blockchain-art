@@ -136,6 +136,11 @@
 		var videoModalActive = false;
 		var newVideoUpload = false;
 
+		var videos;
+		var VIDEO_THRESHOLD = 10;
+		var videoTime = 0;
+		var videoIndex = 0;
+
 		function init() {
       initThree();
      	initCannon();
@@ -164,7 +169,7 @@
       renderer.shadowMapEnabled = true;
 			
 			//it's GOLD
-			coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
+			// coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
 			var silverMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess:50, combine: THREE.MultiplyOperation } );
       // var loader = new THREE.STLLoader();
       var loader = new THREE.OBJLoader();
@@ -200,8 +205,9 @@
 			// 		this.removeEventListener('canplay', createVideo, false);
 			// 	}, false);
 
-			$.get('/api/currentVideo', function(response) {
-				var videoUrl = response.url;
+			$.get('/api/videos', function(response) {
+				videos = response;
+				var videoUrl = videos[0].url;
 				createVideoElement(videoUrl);
 			});
 
@@ -238,6 +244,17 @@
 			var now = new Date().getTime();
 			dt = (now - time)/1000;
 			time = now;
+
+			videoTime += dt;
+
+			if (videoTime > VIDEO_THRESHOLD) {
+				videoTime = 0;
+				videoIndex += 1;
+				if (videoIndex >= videos.length) {
+					videoIndex = 0;
+				}
+				createVideoElement(videos[videoIndex].url);
+			}
 
 			if (mode === 0 || mode === 1) {
 				var mainLeft   = Math.floor( renderWidth  * 0 );
