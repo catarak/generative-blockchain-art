@@ -37,6 +37,7 @@
 	    align-items: center;
 	    height: 100%;
 	    width: 100%;
+	    flex-wrap: wrap;
     }
 
     .video-modal-input {
@@ -47,6 +48,29 @@
     .video-modal-submit {
     	font-size: 16px;
     }
+
+    .video-modal-content {
+    	max-width: 800px;
+    }
+
+    .video-list {
+    	width: 100%;
+    	padding-left: 0;
+    }
+
+    .delete-video-button {
+    	font-family: sans-serif;
+    	text-align: center;
+    	cursor: pointer;
+    	display: inline-block;
+    }
+
+    .video-list-item {
+    	width: 100%;
+    	display: flex;
+    	justify-content: space-between;
+    	line-height: 1.8em;
+    }
 	</style>
 </head>
 <body>
@@ -55,10 +79,17 @@
 	</video> -->
 	<div id="video-modal" class="video-modal hide">
 		<div class="video-modal-inner">
-			<form type="submit" id="video-source-form">
-				<input class="video-modal-input" id="video-url" type="text" placeholder="Video source url">
-				<button class="video-modal-submit" type="submit">Save</button>
-			</form>
+			<div class="video-modal-content">
+				<ul class="video-list" id="video-list">
+					<!-- <li class="video-list-item" data-id="#">
+						<a href="#" target="_blank">#</a><span class="delete-video-button">X</span>
+					</li> -->
+				</ul>
+				<form type="submit" id="video-source-form">
+					<input class="video-modal-input" id="video-url" type="text" placeholder="Video source url">
+					<button class="video-modal-submit" type="submit">Add Video</button>
+				</form>
+			</div>
 		</div>
 	</div>
 	<script>
@@ -397,29 +428,6 @@
 				}
 				handleResize();
 			});
-
-			$("#video-source-form").submit(function(e) {
-				e.preventDefault();
-				newVideoUpload = true;
-				var videoUrl = $(e.target).children("input").val();
-				if (videoUrl.match(/^https?:\/\/.*gif$/)) {
-					toggleVideoSourceModal();
-					$.get("https://upload.gfycat.com/transcode?fetchUrl=" + videoUrl, function(response) {
-							if (response.mp4Url) {
-								$.post('/api/currentVideo', {url: response.mp4Url});
-								createVideoElement(response.mp4Url);
-							}
-					});
-				}
-				else if (videoUrl.match(/^https?:\/\/.*mp4$/)) {
-					$.post('/api/currentVideo', {url: videoUrl});
-					createVideoElement(videoUrl);
-					toggleVideoSourceModal();
-				}
-				else {
-					//error, unrecognized format
-				}
-			});
 		});
 
 		function updateSceneFromMode() {
@@ -456,7 +464,78 @@
 			$("#video-modal").toggleClass("hide");
 			videoModalActive = !videoModalActive;
 			$("#video-url").val('');
+
+			if (!$("#video-modal").hasClass("hide")) {
+				fetchAndRenderVideoUrls();
+			}
 		}
+
+		function fetchAndRenderVideoUrls() {
+			$("#video-list").html('');
+			$.get('/api/videos', function(videos) {
+				videos.forEach(function(video, index, videos) {
+					appendVideoUrlToList(video);
+				});
+			});
+		}
+
+		function appendVideoUrlToList(video) {
+			var videoElement = '<li class="video-list-item" data-id="' + video['$loki'] +'">' + 
+												 '<a href="' + video.url + '" target="_blank">' + video.url + '</a>' + 
+												 '<span class="delete-video-button">X</span></li>';
+			$("#video-list").append(videoElement);
+		}
+
+		//video event listeners
+		$(function() {
+			$("#video-source-form").submit(function(e) {
+				e.preventDefault();
+				newVideoUpload = true;
+				var videoUrl = $(e.target).children("input").val();
+				if (videoUrl.match(/^https?:\/\/.*gif$/)) {
+					// toggleVideoSourceModal();
+					$.get("https://upload.gfycat.com/transcode?fetchUrl=" + videoUrl, function(response) {
+							if (response.mp4Url) {
+								$.post('/api/videos', {url: response.mp4Url}, function(newVideo) {
+									appendVideoUrlToList(newVideo);
+									$("#video-url").val('');
+								});
+								// $.post('/api/currentVideo', {url: response.mp4Url});
+								// createVideoElement(response.mp4Url);
+							}
+					});
+				}
+				else if (videoUrl.match(/^https?:\/\/.*mp4$/)) {
+					$.post('/api/videos', {url: videoUrl}, function(newVideo) {
+						appendVideoUrlToList(newVideo);
+						$("#video-url").val('');
+					});
+					// $.post('/api/currentVideo', {url: videoUrl});
+					// createVideoElement(videoUrl);
+					// toggleVideoSourceModal();
+				}
+				else {
+					//error, unrecognized format
+				}
+			});
+
+			$('#video-list').on('click', '.delete-video-button', function(e) {
+				var videoId = $(e.target).parent().data('id');
+				var videoUrl = $(e.target).siblings().text();
+				if (confirm('Are you sure you want to delete the video ' + videoUrl + '?')) {
+  				$.ajax({
+						url: '/api/videos/' + videoId,
+						method: 'DELETE',
+					}).done(function(response) {
+						//make sure this is good
+						$(e.target).parent().remove();
+					});
+				} else {
+				    // Do nothing!
+				}
+			});
+
+		});
 
 		function createVideoMesh(videoElement) {
 			var texture = new THREE.VideoTexture( videoElement );

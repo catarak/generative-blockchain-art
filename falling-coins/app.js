@@ -33,13 +33,24 @@ app.post('/api/currentVideo', function(req, res) {
 
 app.get('/api/videos', function(req, res) {
 	var Videos = db.getCollection('videos');
-	Videos.find({});
+	res.send(Videos.find({}));
 });
 
-app.delete('/api/videos/:id(\\d+)/', function(req, res) {
-  var videoId = req.param.id;
+app.post('/api/videos', function(req, res) {
+	var Videos = db.getCollection('videos');
+	var videoUrl = req.body.url;
+	var newVideo = Videos.insert({url: videoUrl});
+	db.saveDatabase();
+	res.send(newVideo);
+});
+
+app.delete('/api/videos/:id', function(req, res) {
+  var videoId = req.params.id;
+  // console.log(videoId);
   var Videos = db.getCollection('videos');
-  Videos.remove(req.param.id);
+  Videos.remove(parseInt(videoId));
+  db.saveDatabase();
+  res.send({success: true});
 });
 
 app.listen(8080, function () {
