@@ -207,8 +207,13 @@
 
 			$.get('/api/videos', function(response) {
 				videos = response;
-				var videoUrl = videos[0].url;
-				createVideoElement(videoUrl);
+				videos.forEach(function(video) {
+					createVideoElement(video);
+				});
+				$("video")[0].addEventListener('canplay', function createVideo(e) {
+					createVideoMesh(this);
+					this.removeEventListener('canplay', createVideo, false);
+				}, false);
 			});
 
       document.body.appendChild(renderer.domElement);
@@ -253,7 +258,7 @@
 				if (videoIndex >= videos.length) {
 					videoIndex = 0;
 				}
-				createVideoElement(videos[videoIndex].url);
+				createVideoMesh($("video")[videoIndex]);
 			}
 
 			if (mode === 0 || mode === 1) {
@@ -377,7 +382,7 @@
     setTimeout(handleResize, 500);
 
     socket.on(eventToListenTo, function(data) {
-		  console.log("New transaction received: " + data.txid);
+		  //console.log("New transaction received: " + data.txid);
 		  //add another coin
 		  var newCoin = coinMesh.clone();
 			newCoin.position.set( 0, 10, 0 );
@@ -501,6 +506,7 @@
 												 '<a href="' + video.url + '" target="_blank">' + video.url + '</a>' + 
 												 '<span class="delete-video-button">X</span></li>';
 			$("#video-list").append(videoElement);
+			// videos.push(video);
 		}
 
 		//video event listeners
@@ -515,6 +521,9 @@
 							if (response.mp4Url) {
 								$.post('/api/videos', {url: response.mp4Url}, function(newVideo) {
 									appendVideoUrlToList(newVideo);
+									videos.push(newVideo);
+									createVideoElement(newVideo);
+									$("#video-" + newVideo['$loki'])[0].load();
 									$("#video-url").val('');
 								});
 								// $.post('/api/currentVideo', {url: response.mp4Url});
@@ -525,6 +534,9 @@
 				else if (videoUrl.match(/^https?:\/\/.*mp4$/)) {
 					$.post('/api/videos', {url: videoUrl}, function(newVideo) {
 						appendVideoUrlToList(newVideo);
+						videos.push(newVideo);
+						createVideoElement(newVideo);
+						$("#video-" + newVideo['$loki'])[0].load();
 						$("#video-url").val('');
 					});
 					// $.post('/api/currentVideo', {url: videoUrl});
@@ -546,6 +558,18 @@
 					}).done(function(response) {
 						//make sure this is good
 						$(e.target).parent().remove();
+						var index;
+						for (var i = 0; i < videos.length; i++) {
+							if (videos[i]['$loki'] === videoId) {
+								index = i;
+								break;
+							}
+						}
+						var deletedVideo = videos.splice(index, 1)[0];
+						if (videoIndex >= videos.length) {
+							videoIndex = 0;
+						}
+						$("#video-" + deletedVideo['$loki']).remove(); 
 					});
 				} else {
 				    // Do nothing!
@@ -584,14 +608,14 @@
 			scene.add(videoMesh);
 		}
 
-		function createVideoElement(videoUrl) {
-			$("body").prepend('<video autoplay loop style="display:none" crossorigin="anonymous">' + 
-					'<source src="' + videoUrl + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></video>');
-			$("video")[0].addEventListener('canplay', function createVideo(e) {
-				createVideoMesh(this);
-				$($("video")[1]).remove();
-				this.removeEventListener('canplay', createVideo, false);
-			}, false);
+		function createVideoElement(videoObject) {
+			$("body").append('<video id="video-' + videoObject['$loki'] + '"autoplay loop muted style="display:none" crossorigin="anonymous">' + 
+					'<source src="' + videoObject.url + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></video>');
+			// $("video")[0].addEventListener('canplay', function createVideo(e) {
+			// 	createVideoMesh(this);
+			// 	$($("video")[1]).remove();
+			// 	this.removeEventListener('canplay', createVideo, false);
+			// }, false);
 		}
 	</script>
 </body>
