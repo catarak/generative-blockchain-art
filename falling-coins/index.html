@@ -99,13 +99,14 @@
 	</div>
 	<script>
 		//socket io stuff
+		// var room = 'inv';
+		// var socket = io("https://blockexplorer.com/");
+		// socket.on('connect', function() {
+		//   // Join the room.
+		//   socket.emit('subscribe', room);
+		// });
+		var socket = io("http://localhost:8080");
 		var eventToListenTo = 'tx';
-		var room = 'inv';
-		var socket = io("https://blockexplorer.com/");
-		socket.on('connect', function() {
-		  // Join the room.
-		  socket.emit('subscribe', room);
-		});
 
 		var renderer;
 		var scene;
@@ -145,6 +146,9 @@
 		var VIDEO_THRESHOLD = 10;
 		var videoTime = 0;
 		var videoIndex = 0;
+
+		var coinTime = 0;
+		var COIN_THRESHOLD = 1.5;
 
 		function init() {
       initThree();
@@ -228,7 +232,7 @@
 		function initCannon() {
 			world = new CANNON.World();
 			// world.gravity.set(0, -9.82, 0);
-			world.gravity.set(0, -0.05, 0);
+			world.gravity.set(0, -0.01, 0);
 			world.broadphase = new CANNON.NaiveBroadphase();
 			world.solver.iterations = 10;
 
@@ -264,6 +268,12 @@
 					videoIndex = 0;
 				}
 				createVideoMesh($("video")[videoIndex]);
+			}
+
+			coinTime += dt;
+			if (coinTime > COIN_THRESHOLD) {
+				addCoin();
+				coinTime = 0;
 			}
 
 			if (mode === 0 || mode === 1) {
@@ -388,7 +398,21 @@
     socket.on(eventToListenTo, function(data) {
 		  //console.log("New transaction received: " + data.txid);
 		  //add another coin
-		  var newCoin = coinMesh.clone();
+		  console.log("New transaction");
+		  addCoins(15);
+		  setTimeout(addCoins, 500, 25);
+		  setTimeout(addCoins, 1000, 15);
+		  
+		});
+
+		function addCoins(amount) {
+			for (var i = 0; i < amount; i++) {
+		  	addCoin();
+		  }	
+		}
+
+		function addCoin() {
+			var newCoin = coinMesh.clone();
 			newCoin.position.set( 0, 10, 0 );
 			newCoin.scale.set( 0.3, 0.3, 0.3 );
 			newCoin.castShadow = true;
@@ -407,8 +431,9 @@
 			var shape = new CANNON.Cylinder(0.20, 0.20, 0.07, 64);
 			var x = Math.random()*4 - 2.0;
   		// var y = Math.random()*6.2 - 1.2;
-  		var y = 3;
-  		var z = Math.random()*5 - 4;
+  		// var y = 3;
+  		var y = Math.random()*2.0 + 3;
+  		var z = Math.random()*5 - 7;
 			var body = new CANNON.Body({
 				mass: 1,
 				position: new CANNON.Vec3(x,y,z)
@@ -417,7 +442,7 @@
 			body.angularVelocity.set(Math.random()*1,Math.random()*1,Math.random()*1);
 			world.addBody(body);
 			physicsCoins.push(body);
-		});
+		}
 
 		//change mode on keypress
 		$(function() {

@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var loki = require('lokijs');
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 app.use(express.static('public'));
 
@@ -53,6 +55,17 @@ app.delete('/api/videos/:id', function(req, res) {
   res.send({success: true});
 });
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!');
+//polling for transactions stuff
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
+
+function pollForTransactions() {
+	io.emit('tx');
+}
+
+setInterval(pollForTransactions, 60000);
+
+http.listen(8080, function() {
+	console.log('Listening on port 8080!');
 });
