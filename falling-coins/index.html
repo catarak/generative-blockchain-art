@@ -453,6 +453,7 @@
 		});
 
 		function updateSceneFromMode() {
+			var videoWidth = videoMesh.geometry.parameters.width;
 			switch (mode) {
 				case 0: 
 					if (scene.getObjectByName("videoMesh")) {
@@ -464,18 +465,43 @@
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 0;
+					if (videoWidth < 174) {
+						var hFOV = 61;
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
+					}
+					else {
+						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
+					}
 					break;
 				case 2: 
 					if (!scene.getObjectByName("videoMesh")) {
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 200;
+					if (videoWidth < 174) {
+						// var hFOV = (window.innerWidth/window.innerHeight)*35;
+						// var hFOV = 61;
+						var hFOV = 33;
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
+					}
+					else {
+						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
+					}
 					break;
 				case 3:
 					if (!scene.getObjectByName("videoMesh")) {
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 200;
+					if (videoWidth < 174) {
+						// var hFOV = (window.innerWidth/window.innerHeight)*35;
+						// var hFOV = 61;
+						var hFOV = 33;
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
+					}
+					else {
+						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
+					}
 					break;
 				default:
 					break;
@@ -598,6 +624,7 @@
 			if (videoWidth < 174) {
 				// var hFOV = (window.innerWidth/window.innerHeight)*35;
 				var hFOV = 61;
+				// var hFOV = 33;
 				videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
 			}
 			else {
