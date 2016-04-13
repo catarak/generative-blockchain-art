@@ -326,6 +326,7 @@
 			//cameraControl.update();	
 			updatePhysics();
 			updateSceneFromMode();
+			removeHiddenCoins();
 		}
 
 		//fake physics
@@ -442,6 +443,15 @@
 			body.angularVelocity.set(Math.random()*1,Math.random()*1,Math.random()*1);
 			world.addBody(body);
 			physicsCoins.push(body);
+		}
+
+		function removeHiddenCoins() {
+			while (coins.length > 200) {
+				var oldCoin = coins.shift();
+				scene.remove(oldCoin);
+				var oldPhysicsCoin = physicsCoins.shift();
+				world.removeBody(oldPhysicsCoin);
+			}
 		}
 
 		//change mode on keypress
