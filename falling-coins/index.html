@@ -16,7 +16,14 @@
       margin: 0;
       padding: 0;
       background:white;
+      width: 100%;
+		  height: 100%;
     }
+
+    canvas {
+		  width: 100%;
+		  height: 100%;
+		}
 
     .hide {
 			display: none;
@@ -193,9 +200,9 @@
 
 			renderer = new THREE.WebGLRenderer({antialias: true});
       renderer.setClearColor(0x70716D, 1.0);
+      renderer.setPixelRatio(2);
       renderer.setSize(renderWidth, renderHeight);
       renderer.shadowMapEnabled = true;
-      renderer.setPixelRatio(4);
 			
 			//it's GOLD
 			// coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
@@ -338,12 +345,12 @@
 				if (mode === 2) {
 					mainLeft   = Math.floor( renderWidth  * 0 );
 					mainBottom = Math.floor( renderHeight * 0 );
-					mainWidth  = Math.floor( renderWidth  * 0.45);
+					mainWidth  = Math.floor( renderWidth  * 0.5);
 					mainHeight = Math.floor( renderHeight * 1 );
 					
-					videoLeft   = Math.floor( renderWidth  * 0.45 );
+					videoLeft   = Math.floor( renderWidth  * 0.5 );
 					videoBottom = Math.floor( renderHeight * 0 );
-					videoWidth  = Math.floor( renderWidth  * 0.55);
+					videoWidth  = Math.floor( renderWidth  * 0.5);
 					videoHeight = Math.floor( renderHeight * 1 );
 				}
 				else {
@@ -479,7 +486,7 @@
 			var x = Math.random()*4 - 2.0;
   		// var y = Math.random()*6.2 - 1.2;
   		// var y = 3;
-  		var y = Math.random()*2.0 + 3;
+  		var y = Math.random()*2.0 + 3.5;
   		var z = Math.random()*5 - 7;
 			var body = new CANNON.Body({
 				mass: 1,
@@ -563,7 +570,7 @@
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 200;
-					if (videoWidth < 87) {
+					if (videoWidth < 90) {
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
@@ -578,7 +585,7 @@
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 200;
-					if (videoWidth < 87) {
+					if (videoWidth < 90) {
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
@@ -746,43 +753,6 @@
 			renderer.setClearColor(color);
 		}
 
-		// Below here is only for fullscreen support
-		var isFullscreen = function() {
-		  return document.fullscreenElement || document.mozFullScreenElement ||
-		         document.webkitFullscreenElement || document.msFullscreenElement ||
-		         document.mozFullScreen || document.webkitIsFullScreen;
-		};
-
-		HTMLElement.prototype.requestFullscreen =
-		  HTMLElement.prototype.requestFullscreen ||
-		  HTMLElement.prototype.msRequestFullscreen ||
-		  HTMLElement.prototype.webkitRequestFullscreen ||
-		  HTMLElement.prototype.mozRequestFullscreen ||
-		  function() {};
-
-		document.exitFullscreen =
-		  document.exitFullscreen ||
-		  document.msExitFullscreen ||
-		  document.webkitExitFullscreen ||
-		  document.mozExitFullscreen ||
-		  function() {};
-
-
-		var setupFullscreen = function(element) {
-		  var toggleFullScreen = function() {
-		    if (!isFullscreen()) {
-		      element.requestFullscreen();
-		      handleResize();
-		    } else {
-		      document.exitFullscreen();
-		      handleResize();
-		    }
-		  };
-
-		  element.addEventListener('click', toggleFullScreen, false);
-		};
-		
-		setupFullscreen(document.body);
 	</script>
 </body>
 </html>
