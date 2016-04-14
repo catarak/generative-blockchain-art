@@ -90,9 +90,17 @@
 					<button class="video-modal-submit" type="submit">Add Video</button>
 				</form>
 				<div>
-					<h2>Video Playback Parameters</h2>
-					<input id="video-playback-input" type="range" min="0" max="7" step="0.1" value="1.0" oninput="outputUpdate(value)">
-					<output for="video-playback-input" id="video-playback">1.0</output>
+					<h2>Other Parameters</h2>
+					<div>
+						<label for="video-playback-input">Video Playback Speed</label>
+						<input id="video-playback-input" type="range" min="0" max="7" step="0.1" value="1.0" oninput="outputUpdate(value)">
+						<output for="video-playback-input" id="video-playback">1.0</output>
+					</div>
+					<div>
+						<label for="coins-bg-input">Coins Background Color</label>
+						<input id="coins-bg-input" type="color" oninput="outputColorUpdate(value)">
+						<output for="coins-bg-input" id="coins-bg-color"></output>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -591,6 +599,9 @@
 
 			if (!$("#video-modal").hasClass("hide")) {
 				fetchAndRenderVideoUrls();
+				var bgHex = "#" + renderer.getClearColor().getHex().toString(16);
+				$("#coins-bg-color").text(bgHex);
+				$("#coins-bg-input").val(bgHex);
 			}
 		}
 
@@ -726,6 +737,12 @@
 			$("video").each(function(index) {
 				this.playbackRate = playback;
 			});
+		}
+
+		function outputColorUpdate(color) {
+			document.querySelector('#coins-bg-color').value = color;
+			console.log(color);
+			renderer.setClearColor(color);
 		}
 	</script>
 </body>
