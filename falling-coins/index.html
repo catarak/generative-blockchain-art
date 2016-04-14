@@ -575,7 +575,7 @@
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
-						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 )))) -5;
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 )))) -4;
 					}
 					else {
 						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
@@ -590,7 +590,7 @@
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
-						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 )))) -5;
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 )))) -4;
 					}
 					else {
 						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
@@ -717,10 +717,10 @@
 				scene.remove(videoMesh);
 			}
 			videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-			if (videoWidth < 174) {
+			if (videoWidth < 90) {
 				// var hFOV = (window.innerWidth/window.innerHeight)*35;
-				var hFOV = 61;
-				// var hFOV = 33;
+				// var hFOV = 61;
+				var hFOV = 33;
 				videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
 			}
 			else {
