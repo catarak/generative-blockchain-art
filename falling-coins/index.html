@@ -150,6 +150,16 @@
 		var coinTime = 0;
 		var COIN_THRESHOLD = 1.5;
 
+		//video playback speed stuff
+		// 0 - normal
+		// 1 - slow
+		// 2 - fast
+		var videoMode = 0;
+		var videoModeTime = 0;
+		//could make this a random range
+		//and pick a random mode, leave it for 2 seconds
+		var VIDEO_MODE_THRESHOLD = 20;
+
 		function init() {
       initThree();
      	initCannon();
@@ -173,7 +183,7 @@
 			// cameraControl = new THREE.OrbitControls(camera);
 
 			renderer = new THREE.WebGLRenderer({antialias: true});
-      renderer.setClearColor(0x000000, 1.0);
+      renderer.setClearColor(0x242424, 1.0);
       renderer.setSize(renderWidth, renderHeight);
       renderer.shadowMapEnabled = true;
 			
@@ -517,7 +527,7 @@
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 200;
-					if (videoWidth < 174) {
+					if (videoWidth < 87) {
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
@@ -532,7 +542,7 @@
 						scene.add(videoMesh);
 					}
 					videoMesh.position.x = 200;
-					if (videoWidth < 174) {
+					if (videoWidth < 87) {
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
