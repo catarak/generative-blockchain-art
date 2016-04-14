@@ -698,7 +698,7 @@
 			texture.magFilter = THREE.LinearFilter;
 			texture.format = THREE.RGBFormat;
 
-			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true, side:THREE.DoubleSide } );
+			var videoMaterial = new THREE.MeshBasicMaterial( { map: texture, overdraw: true} );
 
 			var videoWidth = videoElement.videoWidth/videoElement.videoHeight * 100;
 			// var videoGeometry = new THREE.PlaneGeometry( videoWidth, 100);
