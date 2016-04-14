@@ -192,9 +192,10 @@
 			// cameraControl = new THREE.OrbitControls(camera);
 
 			renderer = new THREE.WebGLRenderer({antialias: true});
-      renderer.setClearColor(0x242424, 1.0);
+      renderer.setClearColor(0x70716D, 1.0);
       renderer.setSize(renderWidth, renderHeight);
       renderer.shadowMapEnabled = true;
+      renderer.setPixelRatio(4);
 			
 			//it's GOLD
 			// coinMaterial = new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, combine: THREE.MultiplyOperation } );
