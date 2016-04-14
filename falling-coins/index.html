@@ -772,8 +772,10 @@
 		  var toggleFullScreen = function() {
 		    if (!isFullscreen()) {
 		      element.requestFullscreen();
+		      handleResize();
 		    } else {
 		      document.exitFullscreen();
+		      handleResize();
 		    }
 		  };
 
