@@ -143,7 +143,7 @@
 		var newVideoUpload = false;
 
 		var videos;
-		var VIDEO_THRESHOLD = 30;
+		var VIDEO_THRESHOLD = 60;
 		var videoTime = 0;
 		var videoIndex = 0;
 
@@ -154,11 +154,12 @@
 		// 0 - normal
 		// 1 - slow
 		// 2 - fast
-		var videoMode = 0;
+		var inEffectMode = false;
 		var videoModeTime = 0;
 		//could make this a random range
 		//and pick a random mode, leave it for 2 seconds
-		var VIDEO_MODE_THRESHOLD = 20;
+		var VIDEO_MODE_THRESHOLD = 25;
+		var VIDEO_EFFECT_THRESHOLD = 1;
 
 		function init() {
       initThree();
@@ -284,6 +285,32 @@
 			if (coinTime > COIN_THRESHOLD) {
 				addCoin();
 				coinTime = 0;
+			}
+
+			videoModeTime += dt;
+			if (videoModeTime > VIDEO_MODE_THRESHOLD) {
+				if (!inEffectMode) {
+					inEffectMode = true;
+					var effect = Math.floor(Math.random()*2);
+					var playbackRate;
+					if (effect === 0) {
+						playbackRate = Math.random() * 0.3;
+					}
+					else {
+						playbackRate = Math.random() * 3.0 + 3;
+					}
+					$("video").each(function(index) {
+						this.playbackRate = playbackRate;
+					});
+					console.log("adding effect: " + playbackRate);
+				}
+				if (videoModeTime > VIDEO_MODE_THRESHOLD + VIDEO_EFFECT_THRESHOLD) {
+					$("video").each(function(index) {
+						this.playbackRate = 1.0;
+					});
+					videoModeTime = 0;
+					inEffectMode = false;
+				}
 			}
 
 			if (mode === 0 || mode === 1) {
