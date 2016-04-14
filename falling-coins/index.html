@@ -158,7 +158,9 @@
 		var newVideoUpload = false;
 
 		var videos;
-		var VIDEO_THRESHOLD = 60;
+		var VIDEO_THRESHOLD;
+		var VIDEO_TWO_THRESHOLD;
+		var onSecondVideo = false;
 		var videoTime = 0;
 		var videoIndex = 0;
 
@@ -173,8 +175,9 @@
 		var videoModeTime = 0;
 		//could make this a random range
 		//and pick a random mode, leave it for 2 seconds
-		var VIDEO_MODE_THRESHOLD = 25;
-		var VIDEO_EFFECT_THRESHOLD = 1;
+		// var VIDEO_MODE_THRESHOLD = 25;
+		var VIDEO_MODE_THRESHOLD = Math.random()*25 + 10;
+		var VIDEO_EFFECT_THRESHOLD = 0.7;
 
 		function init() {
       initThree();
@@ -289,13 +292,33 @@
 
 			videoTime += dt;
 
+			if (VIDEO_THRESHOLD === undefined) {
+				VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
+			}
+			if (VIDEO_TWO_THRESHOLD === undefined) {
+				VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
+			}
+
 			if (videoTime > VIDEO_THRESHOLD) {
-				videoTime = 0;
-				videoIndex += 1;
-				if (videoIndex >= videos.length) {
-					videoIndex = 0;
+				if (!onSecondVideo) {
+					$("video")[videoIndex].pause();
+					videoIndex += 1;
+					// if (videoIndex >= videos.length) {
+					// 	videoIndex = 0;
+					// }
+					$("video")[videoIndex].currentTime = 0;
+					createVideoMesh($("video")[videoIndex]);
+					onSecondVideo = true;
 				}
-				createVideoMesh($("video")[videoIndex]);
+				if (videoTime > VIDEO_THRESHOLD + VIDEO_TWO_THRESHOLD) {
+					videoIndex = 0;
+					videoTime = 0;
+					VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
+					VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
+					onSecondVideo = false;
+					$("video")[videoIndex].play();
+					createVideoMesh($("video")[videoIndex]);
+				}
 			}
 
 			coinTime += dt;
@@ -303,7 +326,7 @@
 				addCoin();
 				coinTime = 0;
 			}
-
+			
 			videoModeTime += dt;
 			if (videoModeTime > VIDEO_MODE_THRESHOLD) {
 				if (!inEffectMode) {
@@ -311,10 +334,10 @@
 					var effect = Math.floor(Math.random()*2);
 					var playbackRate;
 					if (effect === 0) {
-						playbackRate = Math.random() * 0.3;
+						playbackRate = Math.random() * 0.4;
 					}
 					else {
-						playbackRate = Math.random() * 3.0 + 3;
+						playbackRate = Math.random() * 2.0 + 4;
 					}
 					$("video").each(function(index) {
 						this.playbackRate = playbackRate;
@@ -327,6 +350,7 @@
 					});
 					videoModeTime = 0;
 					inEffectMode = false;
+					VIDEO_MODE_THRESHOLD = Math.random()*20 + 10;
 				}
 			}
 
@@ -455,8 +479,8 @@
 		  //add another coin
 		  console.log("New transaction");
 		  addCoins(15);
-		  setTimeout(addCoins, 500, 25);
-		  setTimeout(addCoins, 1000, 15);
+		  setTimeout(addCoins, 1500, 30);
+		  setTimeout(addCoins, 3000, 15);
 		  
 		});
 
