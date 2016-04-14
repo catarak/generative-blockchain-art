@@ -338,12 +338,12 @@
 				if (mode === 2) {
 					mainLeft   = Math.floor( renderWidth  * 0 );
 					mainBottom = Math.floor( renderHeight * 0 );
-					mainWidth  = Math.floor( renderWidth  * 0.5);
+					mainWidth  = Math.floor( renderWidth  * 0.45);
 					mainHeight = Math.floor( renderHeight * 1 );
 					
-					videoLeft   = Math.floor( renderWidth  * 0.5 );
+					videoLeft   = Math.floor( renderWidth  * 0.45 );
 					videoBottom = Math.floor( renderHeight * 0 );
-					videoWidth  = Math.floor( renderWidth  * 0.5);
+					videoWidth  = Math.floor( renderWidth  * 0.55);
 					videoHeight = Math.floor( renderHeight * 1 );
 				}
 				else {
@@ -745,6 +745,42 @@
 			console.log(color);
 			renderer.setClearColor(color);
 		}
+
+		// Below here is only for fullscreen support
+		var isFullscreen = function() {
+		  return document.fullscreenElement || document.mozFullScreenElement ||
+		         document.webkitFullscreenElement || document.msFullscreenElement ||
+		         document.mozFullScreen || document.webkitIsFullScreen;
+		};
+
+		HTMLElement.prototype.requestFullscreen =
+		  HTMLElement.prototype.requestFullscreen ||
+		  HTMLElement.prototype.msRequestFullscreen ||
+		  HTMLElement.prototype.webkitRequestFullscreen ||
+		  HTMLElement.prototype.mozRequestFullscreen ||
+		  function() {};
+
+		document.exitFullscreen =
+		  document.exitFullscreen ||
+		  document.msExitFullscreen ||
+		  document.webkitExitFullscreen ||
+		  document.mozExitFullscreen ||
+		  function() {};
+
+
+		var setupFullscreen = function(element) {
+		  var toggleFullScreen = function() {
+		    if (!isFullscreen()) {
+		      element.requestFullscreen();
+		    } else {
+		      document.exitFullscreen();
+		    }
+		  };
+
+		  element.addEventListener('click', toggleFullScreen, false);
+		};
+		
+		setupFullscreen(document.body);
 	</script>
 </body>
 </html>
