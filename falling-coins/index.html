@@ -200,7 +200,8 @@
 
 			renderer = new THREE.WebGLRenderer({antialias: true});
       renderer.setClearColor(0x70716D, 1.0);
-      renderer.setPixelRatio(2);
+      var ratio = window.devicePixelRatio || 1;
+      renderer.setPixelRatio(ratio);
       renderer.setSize(renderWidth, renderHeight);
       renderer.shadowMapEnabled = true;
 			
@@ -574,7 +575,7 @@
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
-						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 )))) -5;
 					}
 					else {
 						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
@@ -589,7 +590,7 @@
 						// var hFOV = (window.innerWidth/window.innerHeight)*35;
 						// var hFOV = 61;
 						var hFOV = 33;
-						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 ))));
+						videoMesh.position.z = -(videoWidth / (2 * Math.tan(( Math.PI * hFOV / 360 )))) -5;
 					}
 					else {
 						videoMesh.position.z = -(100 / 2 / Math.tan(Math.PI * 35 / 360)) + 8;
