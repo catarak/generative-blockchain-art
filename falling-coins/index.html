@@ -297,7 +297,9 @@
 
 			if (videoTime > VIDEO_THRESHOLD) {
 				if (!onSecondVideo) {
-					$("video")[videoIndex].pause();
+					setTimeout(function() {
+							$("video")[0].pause();	
+					}, 300);
 					videoIndex += 1;
 					// if (videoIndex >= videos.length) {
 					// 	videoIndex = 0;
@@ -773,7 +775,10 @@
 
 			//check if videoMesh is currently in the scene
 			if (scene.getObjectByName("videoMesh")) {
-				scene.remove(videoMesh);
+				var oldVideoMesh = scene.getObjectByName("videoMesh");
+				setTimeout(function() {
+					scene.remove(oldVideoMesh);
+				}, 300);
 			}
 			videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 			if (videoWidth < 90) {
@@ -788,6 +793,11 @@
 			videoMesh.name = "videoMesh";
 			videoMesh.position.x = 200;
 			scene.add(videoMesh);
+			videoMesh.material.transparent = true;
+			videoMesh.material.opacity = 0;
+			setTimeout(function() {
+				videoMesh.material.opacity = 1;
+			}, 300);
 		}
 
 		function createVideoElement(videoObject) {
