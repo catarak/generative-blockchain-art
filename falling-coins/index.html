@@ -178,6 +178,7 @@
 		// var VIDEO_MODE_THRESHOLD = 25;
 		var VIDEO_MODE_THRESHOLD = Math.random()*25 + 10;
 		var VIDEO_EFFECT_THRESHOLD = 0.7;
+		var VIDEO_TWO_EFFECT_OFFSET = Math.random()*(VIDEO_TWO_THRESHOLD - VIDEO_EFFECT_THRESHOLD - 0.2);
 
 		var ladyMode = 0;
 
@@ -304,12 +305,23 @@
 					$("video")[videoIndex].currentTime = 0;
 					createVideoMesh($("video")[videoIndex]);
 					onSecondVideo = true;
+					var changeVideoSpeed = Math.floor(Math.random()*2);
+					if (changeVideoSpeed === 1) {
+						console.log("change second video speed");
+						setTimeout(function() {
+							$("video")[videoIndex].playbackRate = Math.random() * 2.0 + 4;
+						}, VIDEO_TWO_EFFECT_OFFSET*1000);
+					}
+				}
+				if (videoTime > VIDEO_THRESHOLD + VIDEO_EFFECT_THRESHOLD + VIDEO_TWO_EFFECT_OFFSET) {
+					$("video")[videoIndex].playbackSpeed = 1.0;
 				}
 				if (videoTime > VIDEO_THRESHOLD + VIDEO_TWO_THRESHOLD) {
 					videoIndex = 0;
 					videoTime = 0;
 					VIDEO_THRESHOLD = Math.random()*15.0 + 45.0;
 					VIDEO_TWO_THRESHOLD = Math.random()*2.0 + 2.0;
+					VIDEO_TWO_EFFECT_OFFSET = Math.random()*(VIDEO_TWO_THRESHOLD - VIDEO_EFFECT_THRESHOLD - 0.2);
 					onSecondVideo = false;
 					$("video")[videoIndex].play();
 					createVideoMesh($("video")[videoIndex]);
