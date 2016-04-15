@@ -158,8 +158,8 @@
 		var newVideoUpload = false;
 
 		var videos;
-		var VIDEO_THRESHOLD;
-		var VIDEO_TWO_THRESHOLD;
+		var VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
+		var VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
 		var onSecondVideo = false;
 		var videoTime = 0;
 		var videoIndex = 0;
@@ -178,6 +178,8 @@
 		// var VIDEO_MODE_THRESHOLD = 25;
 		var VIDEO_MODE_THRESHOLD = Math.random()*25 + 10;
 		var VIDEO_EFFECT_THRESHOLD = 0.7;
+
+		var ladyMode = 0;
 
 		function init() {
       initThree();
@@ -292,13 +294,6 @@
 
 			videoTime += dt;
 
-			if (VIDEO_THRESHOLD === undefined) {
-				VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
-			}
-			if (VIDEO_TWO_THRESHOLD === undefined) {
-				VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
-			}
-
 			if (videoTime > VIDEO_THRESHOLD) {
 				if (!onSecondVideo) {
 					$("video")[videoIndex].pause();
@@ -313,8 +308,8 @@
 				if (videoTime > VIDEO_THRESHOLD + VIDEO_TWO_THRESHOLD) {
 					videoIndex = 0;
 					videoTime = 0;
-					VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
-					VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
+					// VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
+					// VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
 					onSecondVideo = false;
 					$("video")[videoIndex].play();
 					createVideoMesh($("video")[videoIndex]);
@@ -405,6 +400,7 @@
 			updatePhysics();
 			updateSceneFromMode();
 			removeHiddenCoins();
+			updateVideoThresholdFromMode();
 		}
 
 		//fake physics
@@ -549,6 +545,15 @@
 						case 51: //3
 							mode = 3;
 							break;
+						case 52: //4
+							ladyMode = 0;
+							break;
+						case 53: //5
+							ladyMode = 1;
+							break;
+						case 54: //6
+							ladyMode = 2;
+							break;
 						case 86: //v
 							toggleVideoSourceModal();
 							break;
@@ -622,6 +627,24 @@
 					break;
 				default:
 					break;
+			}
+		}
+
+		function updateVideoThresholdFromMode() {
+			switch (ladyMode) {
+				case 0: 
+					VIDEO_THRESHOLD = 30;
+					VIDEO_TWO_THRESHOLD = 2;
+					break;
+				case 1:
+					VIDEO_THRESHOLD = 45;
+					VIDEO_TWO_THRESHOLD = 4;
+					break;
+				case 2:
+					VIDEO_THRESHOLD = 60;
+					VIDEO_TWO_THRESHOLD = 8;
+				default: 
+					break
 			}
 		}
 
