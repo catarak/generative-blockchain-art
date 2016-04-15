@@ -158,8 +158,8 @@
 		var newVideoUpload = false;
 
 		var videos;
-		var VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
-		var VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
+		var VIDEO_THRESHOLD = Math.random()*15.0 + 45.0;
+		var VIDEO_TWO_THRESHOLD = Math.random()*2.0 + 2.5;
 		var onSecondVideo = false;
 		var videoTime = 0;
 		var videoIndex = 0;
@@ -308,8 +308,8 @@
 				if (videoTime > VIDEO_THRESHOLD + VIDEO_TWO_THRESHOLD) {
 					videoIndex = 0;
 					videoTime = 0;
-					// VIDEO_THRESHOLD = Math.random()*30.0 + 30.0;
-					// VIDEO_TWO_THRESHOLD = Math.random()*10.0 + 2.0;
+					VIDEO_THRESHOLD = Math.random()*15.0 + 45.0;
+					VIDEO_TWO_THRESHOLD = Math.random()*2.0 + 2.0;
 					onSecondVideo = false;
 					$("video")[videoIndex].play();
 					createVideoMesh($("video")[videoIndex]);
@@ -400,7 +400,7 @@
 			updatePhysics();
 			updateSceneFromMode();
 			removeHiddenCoins();
-			updateVideoThresholdFromMode();
+			// updateVideoThresholdFromMode();
 		}
 
 		//fake physics
@@ -630,23 +630,23 @@
 			}
 		}
 
-		function updateVideoThresholdFromMode() {
-			switch (ladyMode) {
-				case 0: 
-					VIDEO_THRESHOLD = 30;
-					VIDEO_TWO_THRESHOLD = 2;
-					break;
-				case 1:
-					VIDEO_THRESHOLD = 45;
-					VIDEO_TWO_THRESHOLD = 4;
-					break;
-				case 2:
-					VIDEO_THRESHOLD = 60;
-					VIDEO_TWO_THRESHOLD = 8;
-				default: 
-					break
-			}
-		}
+		// function updateVideoThresholdFromMode() {
+		// 	switch (ladyMode) {
+		// 		case 0: 
+		// 			VIDEO_THRESHOLD = 30;
+		// 			VIDEO_TWO_THRESHOLD = 2;
+		// 			break;
+		// 		case 1:
+		// 			VIDEO_THRESHOLD = 45;
+		// 			VIDEO_TWO_THRESHOLD = 4;
+		// 			break;
+		// 		case 2:
+		// 			VIDEO_THRESHOLD = 60;
+		// 			VIDEO_TWO_THRESHOLD = 8;
+		// 		default: 
+		// 			break
+		// 	}
+		// }
 
 		function toggleVideoSourceModal() {
 			$("#video-modal").toggleClass("hide");
