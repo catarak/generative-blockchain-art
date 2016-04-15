@@ -756,7 +756,7 @@
 		}
 
 		function createVideoElement(videoObject) {
-			$("body").append('<video id="video-' + videoObject['$loki'] + '"autoplay loop muted style="display:none" crossorigin="anonymous">' + 
+			$("body").append('<video id="video-' + videoObject['$loki'] + '"autoplay loop muted style="display:none" crossorigin="anonymous" preload="true">' + 
 					'<source src="' + videoObject.url + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\'></video>');
 			// $("video")[0].addEventListener('canplay', function createVideo(e) {
 			// 	createVideoMesh(this);

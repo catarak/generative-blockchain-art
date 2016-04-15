@@ -4,6 +4,7 @@ var path = require('path');
 var loki = require('lokijs');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var request = require('request');
 
 app.use(express.static('public'));
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 })); 
 
 var db = new loki('dividend.json', {autoload: true});
+var totalTransactions;
 
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname + '/index.html'));
@@ -61,10 +63,25 @@ io.on('connection', function(socket){
 });
 
 function pollForTransactions() {
-	io.emit('tx');
+	request("https://counterpartychain.io/api/sends/dividendplus", function(err, response) {
+		if (!err && response.statusCode == 200) {
+			var body = JSON.parse(response.body);
+	    var total = parseInt(body.total)
+	    if (totalTransactions === undefined) {
+	    	totalTransactions = total;
+	    }
+
+	    if (total > totalTransactions) {
+	    	for (var i = 0; i < total - totalTransactions; i++) {
+	    		io.emit('tx');
+	    	}
+	    }
+	    totalTransactions = total;
+	  }
+	});
 }
 
-setInterval(pollForTransactions, 60000);
+setInterval(pollForTransactions, 5000);
 
 http.listen(8080, function() {
 	console.log('Listening on port 8080!');
