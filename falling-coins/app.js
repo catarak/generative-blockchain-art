@@ -5,6 +5,7 @@ var loki = require('lokijs');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var request = require('request');
+var fs = require('fs');
 
 app.use(express.static('public'));
 
@@ -60,6 +61,11 @@ app.delete('/api/videos/:id', function(req, res) {
 //polling for transactions stuff
 io.on('connection', function(socket){
   console.log('a user connected');
+  socket.on('render-frame', function (data) {
+      data.file = data.file.split(',')[1]; // Get rid of the data:image/png;base64 at the beginning of the file data
+      var buffer = new Buffer(data.file, 'base64');
+      fs.writeFile(__dirname + '/tmp/frame-' + data.frame + '.png', buffer.toString('binary'), 'binary');
+  });
 });
 
 function pollForTransactions() {

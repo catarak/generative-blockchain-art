@@ -182,6 +182,9 @@
 
 		var ladyMode = 0;
 
+		var screenRecord = false;
+		var frame = 0;
+
 		function init() {
       initThree();
      	initCannon();
@@ -415,6 +418,13 @@
 			updateSceneFromMode();
 			removeHiddenCoins();
 			// updateVideoThresholdFromMode();
+
+			if (screenRecord) {
+				socket.emit('render-frame', {
+            frame: frame++,
+            file: document.querySelector('canvas').toDataURL()
+        });
+			}
 		}
 
 		//fake physics
@@ -570,6 +580,10 @@
 							break;
 						case 86: //v
 							toggleVideoSourceModal();
+							break;
+						case 82: //r
+							screenRecord = !screenRecord;
+							frame = 0;
 							break;
 						default:
 							break;
