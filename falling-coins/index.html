@@ -420,10 +420,13 @@
 			// updateVideoThresholdFromMode();
 
 			if (screenRecord) {
-				socket.emit('render-frame', {
-            frame: frame++,
-            file: document.querySelector('canvas').toDataURL()
-        });
+				if (frame % 2 === 0) {
+					socket.emit('render-frame', {
+	            frame: frame/2,
+	            file: document.querySelector('canvas').toDataURL()
+	        });
+				}
+				frame++;
 			}
 		}
 

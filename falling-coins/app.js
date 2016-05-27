@@ -68,26 +68,32 @@ io.on('connection', function(socket){
   });
 });
 
-function pollForTransactions() {
-	request("https://counterpartychain.io/api/sends/dividendplus", function(err, response) {
-		if (!err && response.statusCode == 200) {
-			var body = JSON.parse(response.body);
-	    var total = parseInt(body.total)
-	    if (totalTransactions === undefined) {
-	    	totalTransactions = total;
-	    }
+// function pollForTransactions() {
+// 	request("https://counterpartychain.io/api/sends/dividendplus", function(err, response) {
+// 		if (!err && response.statusCode == 200) {
+// 			var body = JSON.parse(response.body);
+// 	    var total = parseInt(body.total)
+// 	    if (totalTransactions === undefined) {
+// 	    	totalTransactions = total;
+// 	    }
 
-	    if (total > totalTransactions) {
-	    	for (var i = 0; i < total - totalTransactions; i++) {
-	    		io.emit('tx');
-	    	}
-	    }
-	    totalTransactions = total;
-	  }
-	});
+// 	    if (total > totalTransactions) {
+// 	    	for (var i = 0; i < total - totalTransactions; i++) {
+// 	    		io.emit('tx');
+// 	    	}
+// 	    }
+// 	    totalTransactions = total;
+// 	  }
+// 	});
+// }
+
+// setInterval(pollForTransactions, 5000);
+
+function fakeTransaction() {
+	io.emit('tx');
 }
 
-setInterval(pollForTransactions, 5000);
+setInterval(fakeTransaction, 35000);
 
 http.listen(8080, function() {
 	console.log('Listening on port 8080!');
